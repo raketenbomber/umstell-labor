@@ -1,0 +1,1177 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Umstell-Labor</title>
+<meta name="description" content="Formeln der Elektrotechnik umstellen – Runde für Runde schwerer.">
+<meta name="theme-color" content="#0B7A54">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Umstell-Labor">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{color-scheme:light; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0; font-size:14px; font-family:system-ui,sans-serif}
+img{max-width:100%}
+html,body{overscroll-behavior-y:none}
+</style>
+</head>
+<body>
+<style>
+/* Layout: eine Spalte wie ein Laborpult – Messgeräte-Panels auf Platinen-Raster, Formeln in Lehrbuch-Kursiv */
+:root{
+  --bg:#E7EEEA; --grid:#CBD9D1; --panel:#F8FBF9; --panel-2:#E0E9E4; --ink:#10211A; --muted:#536A5F; --line:#C1D2C9;
+  --acc:#0B7A54; --acc-ink:#FFFFFF; --acc-soft:#D2EEE1;
+  --sig:#9A5A00; --sig-soft:#FCEBCB;
+  --ok:#137F46; --ok-soft:#DBF2E5; --bad:#BF2F37; --bad-soft:#FBE2E3;
+  --f-disp:"Chakra Petch","Avenir Next Condensed",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --f-math:"STIX Two Text","Times New Roman",Times,serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#09130F; --grid:#13241C; --panel:#0F1D17; --panel-2:#16291F; --ink:#E1EEE7; --muted:#8CA698; --line:#22392D;
+  --acc:#3BD69B; --acc-ink:#04140D; --acc-soft:#113426;
+  --sig:#FFBA42; --sig-soft:#3A2A0B;
+  --ok:#47D98C; --ok-soft:#0F3322; --bad:#FF7070; --bad-soft:#3B1618; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#09130F; --grid:#13241C; --panel:#0F1D17; --panel-2:#16291F; --ink:#E1EEE7; --muted:#8CA698; --line:#22392D;
+  --acc:#3BD69B; --acc-ink:#04140D; --acc-soft:#113426;
+  --sig:#FFBA42; --sig-soft:#3A2A0B;
+  --ok:#47D98C; --ok-soft:#0F3322; --bad:#FF7070; --bad-soft:#3B1618; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--bg); background-image:radial-gradient(var(--grid) 1px, transparent 1.3px); background-size:22px 22px;
+  color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.45; -webkit-tap-highlight-color:transparent;
+  -webkit-text-size-adjust:100%}
+#app{max-width:760px; margin:0 auto; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:14px 40px}
+button{font:inherit; color:inherit; touch-action:manipulation; cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--sig); outline-offset:2px}
+h1,h2,h3{font-family:var(--f-disp); line-height:1.1; margin:0; text-wrap:balance; letter-spacing:.01em}
+p{margin:0}
+.muted{color:var(--muted)}
+.label{font-family:var(--f-disp); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600}
+
+/* ---------- Mathe-Satz ---------- */
+.m{font-family:var(--f-math); white-space:nowrap; font-feature-settings:"lnum"}
+.m i{font-style:italic}
+.m sup,.m sub{font-size:.62em; line-height:0}
+.m sub{font-style:normal}
+.op{margin:0 .2em; font-style:normal}
+.es{margin:0 .4em}
+.pa{font-style:normal}
+.fr{display:inline-flex; flex-direction:column; align-items:stretch; vertical-align:middle; margin:0 .1em; text-align:center}
+.fr>.fn{border-bottom:.075em solid currentColor; padding:0 .2em .08em}
+.fr>.fd{padding:.08em .2em 0}
+.fr .fr{font-size:.92em}
+.rt{display:inline-flex; align-items:stretch; vertical-align:middle}
+.rsv{width:.62em; flex:none; height:auto; overflow:visible}
+.rsv path{fill:none; stroke:currentColor; stroke-width:1.4; vector-effect:non-scaling-stroke; stroke-linejoin:round; stroke-linecap:round}
+.ri{border-top:.075em solid currentColor; padding:.14em .14em 0 .06em; display:inline-flex; align-items:center}
+.mix{display:inline-flex; align-items:center}
+
+/* ---------- Startseite ---------- */
+.brand{display:flex; align-items:center; gap:14px; padding-block:10px 4px}
+.logo{width:54px; height:54px; flex:none; border-radius:12px; background:var(--acc); color:var(--acc-ink); display:grid; place-items:center}
+.brand h1{font-size:clamp(1.9rem, 7vw, 2.6rem); font-weight:700}
+.brand p{color:var(--muted); font-size:.95rem}
+.meters{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-block:18px}
+.meter{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px 12px; min-width:0}
+.meter b{display:block; font-family:var(--f-disp); font-size:1.5rem; font-variant-numeric:tabular-nums; font-weight:600}
+.meter span{font-size:.75rem; color:var(--muted)}
+.modes{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px}
+.mode{display:flex; flex-direction:column; gap:6px; text-align:left; padding:14px; border-radius:var(--r); border:1px solid var(--line); background:var(--panel); min-height:132px; transition:transform .12s ease, border-color .12s}
+.mode:hover{border-color:var(--acc)}
+.mode:active{transform:scale(.98)}
+.mode svg{width:30px; height:30px; color:var(--acc)}
+.mode h3{font-size:1.15rem; font-weight:600}
+.mode p{font-size:.86rem; color:var(--muted); line-height:1.35}
+.mode .rec{margin-top:auto; font-family:var(--f-disp); font-size:.78rem; color:var(--sig); font-weight:600; letter-spacing:.03em}
+.mode.hero{grid-column:1/-1; background:var(--acc); color:var(--acc-ink); border-color:var(--acc); min-height:0; flex-direction:row; align-items:center; gap:14px}
+.mode.hero svg{color:var(--acc-ink); width:40px; height:40px; flex:none}
+.mode.hero p,.mode.hero .rec{color:var(--acc-ink); opacity:.85}
+.mode.hero .txt{display:flex; flex-direction:column; gap:4px; min-width:0}
+.mode.hero h3{font-size:1.4rem}
+.mode.frac svg{color:var(--sig)}
+.links{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 18px; border-radius:12px; border:1px solid var(--line); background:var(--panel); font-weight:500; min-height:48px}
+.btn.pri{background:var(--acc); color:var(--acc-ink); border-color:var(--acc); font-family:var(--f-disp); font-weight:600; letter-spacing:.03em; font-size:1.05rem}
+.btn.wide{width:100%}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad); border-color:var(--bad)}
+
+/* ---------- Spiel-HUD ---------- */
+.hud{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; margin-bottom:10px}
+.iconbtn{width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:var(--panel); display:grid; place-items:center; font-size:1.1rem}
+.hud-mid{min-width:0}
+.hud-mid .t{font-family:var(--f-disp); font-weight:600; font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.pips{display:flex; gap:4px; margin-top:4px}
+.pip{height:5px; flex:1; max-width:34px; border-radius:3px; background:var(--panel-2)}
+.pip.ok{background:var(--ok)} .pip.bad{background:var(--bad)} .pip.cur{background:var(--sig)}
+.hud-r{text-align:right}
+.score{font-family:var(--f-disp); font-weight:700; font-size:1.35rem; font-variant-numeric:tabular-nums; line-height:1}
+.fuses{display:flex; gap:3px; justify-content:flex-end; margin-top:5px}
+.fuse{width:22px; height:12px; color:var(--acc)}
+.fuse.blown{color:var(--bad); opacity:.75}
+.streak{font-family:var(--f-disp); font-size:.78rem; color:var(--sig); font-weight:600; min-height:1em; letter-spacing:.04em}
+.timebar{height:6px; border-radius:3px; background:var(--panel-2); overflow:hidden; margin-bottom:12px}
+.timebar i{display:block; height:100%; width:100%; background:var(--acc); transform-origin:left; transition:background .3s}
+.timebar.low i{background:var(--bad)}
+.timetxt{font-family:var(--f-disp); font-variant-numeric:tabular-nums; font-size:.82rem; color:var(--muted); text-align:right; margin:-8px 0 8px}
+
+.qcard{background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:16px 16px 18px}
+.qhead{display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+.chip{display:inline-flex; align-items:center; gap:6px; font-size:.76rem; padding:3px 9px; border-radius:99px; background:var(--panel-2); color:var(--muted); font-weight:500}
+.chip.sig{background:var(--sig-soft); color:var(--sig)}
+.qtext{font-size:1.02rem; margin-bottom:6px}
+.qtext .m{font-size:1.15em}
+.formula{font-size:clamp(1.55rem, 6.6vw, 2.3rem); padding-block:14px 6px; overflow-x:auto; overflow-y:hidden; text-align:center; -webkit-overflow-scrolling:touch}
+.given{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:10px}
+.given .gv{background:var(--panel-2); border-radius:9px; padding:5px 10px; font-size:1.05rem}
+.answer{margin-top:12px}
+.opts{display:grid; gap:8px}
+@media (min-width:600px){ .opts{grid-template-columns:1fr 1fr} }
+.opt{display:flex; align-items:center; gap:12px; text-align:left; padding:10px 14px; min-height:70px; border-radius:12px; border:1.5px solid var(--line); background:var(--panel); font-size:1.35rem; overflow-x:auto}
+.opt:hover{border-color:var(--acc)}
+.opt .n{font-family:var(--f-disp); font-size:.8rem; color:var(--muted); width:22px; height:22px; flex:none; border-radius:6px; border:1px solid var(--line); display:grid; place-items:center}
+.opt.ok{border-color:var(--ok); background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad); background:var(--bad-soft)}
+.opt.dim{opacity:.45}
+.opt[disabled]{cursor:default}
+.opt.sym{justify-content:center; font-size:2rem; min-height:64px}
+.opts.sym{grid-template-columns:repeat(3,1fr)}
+
+/* Baukasten */
+.build{background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:14px}
+.bline{display:flex; align-items:center; justify-content:center; gap:6px; font-size:1.6rem; min-height:150px; overflow-x:auto}
+.bline .es{margin:0 .25em}
+.bfrac{display:inline-flex; flex-direction:column; align-items:stretch; min-width:150px}
+.zone{min-height:58px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:6px; padding:6px; border-radius:10px; border:1.5px dashed var(--line)}
+.zone.empty::after{content:attr(data-ph); font-family:var(--f-body); font-size:.8rem; color:var(--muted)}
+.bbar{height:2.5px; background:var(--ink); margin:6px 0; border-radius:2px}
+.brt{display:inline-flex; align-items:stretch}
+.brt .rsv{width:26px}
+.brt .rsv path{stroke-width:2.2}
+.brt .bin{border-top:2.5px solid var(--ink); padding:8px 4px 2px 6px}
+.pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; min-height:62px; padding:10px; border-radius:12px; background:var(--panel-2); margin-top:12px}
+.tile{font-family:var(--f-math); font-size:1.45rem; min-width:54px; min-height:50px; padding:4px 12px; border-radius:10px; border:1.5px solid var(--line); background:var(--panel); box-shadow:0 2px 0 var(--line); display:inline-flex; align-items:center; justify-content:center}
+.tile.inz{border-color:var(--acc); background:var(--acc-soft); box-shadow:none}
+.tile.ok{border-color:var(--ok); background:var(--ok-soft)}
+.tile.bad{border-color:var(--bad); background:var(--bad-soft)}
+.bctl{display:grid; grid-template-columns:auto 1fr; gap:8px; margin-top:12px}
+.rootbtn{font-family:var(--f-math); font-size:1.3rem; min-width:92px}
+.rootbtn[aria-pressed="true"]{background:var(--sig-soft); border-color:var(--sig); color:var(--sig)}
+.hint{font-size:.82rem; color:var(--muted); text-align:center; margin-top:8px}
+
+/* Eingabe + Tastenfeld */
+.inrow{display:flex; align-items:center; justify-content:center; gap:10px; font-size:1.5rem; padding-block:8px 12px; flex-wrap:wrap}
+.field{min-width:120px; min-height:56px; padding:6px 14px; border-radius:12px; border:2px solid var(--line); background:var(--panel); font-family:var(--f-disp); font-size:1.6rem; font-variant-numeric:tabular-nums; display:inline-flex; align-items:center; justify-content:center}
+.field.act{border-color:var(--acc); box-shadow:0 0 0 3px var(--acc-soft)}
+.field .ph{color:var(--muted); font-size:1rem; font-family:var(--f-body)}
+.field.shake{animation:shake .35s}
+.ffr{display:inline-flex; flex-direction:column; align-items:stretch; gap:6px}
+.ffr .bar{height:3px; background:var(--ink); border-radius:2px}
+.unit{font-family:var(--f-math); font-size:1.5rem}
+.kp{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
+.k{min-height:56px; border-radius:12px; border:1px solid var(--line); background:var(--panel); font-family:var(--f-disp); font-size:1.4rem; font-weight:500; box-shadow:0 2px 0 var(--line)}
+.k:active{transform:translateY(1px); box-shadow:none}
+.k.fn{background:var(--panel-2); font-size:1rem}
+.k.go{background:var(--acc); color:var(--acc-ink); border-color:var(--acc); box-shadow:none; font-size:1.1rem; grid-row:span 2}
+@media (min-width:600px){ .kp{max-width:420px; margin:0 auto} }
+
+/* Rückmeldung */
+.fb{margin-top:12px; border-radius:var(--r); padding:16px; border:1.5px solid var(--line); background:var(--panel)}
+.fb.ok{border-color:var(--ok)}
+.fb.bad{border-color:var(--bad)}
+.fbh{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px}
+.fbh h2{font-size:1.35rem}
+.fb.ok h2{color:var(--ok)} .fb.bad h2{color:var(--bad)}
+.pts{font-family:var(--f-disp); font-weight:700; color:var(--sig); font-size:1.15rem}
+.sol{font-size:1.45rem; text-align:center; padding:10px 0; overflow-x:auto}
+.note{font-size:.9rem; color:var(--muted); margin-bottom:6px}
+.steps{list-style:none; margin:8px 0 14px; padding:0; display:grid; gap:6px; counter-reset:s}
+.steps li{display:grid; grid-template-columns:26px 1fr; gap:8px; align-items:start; background:var(--panel-2); border-radius:10px; padding:8px 10px; counter-increment:s; min-width:0}
+.steps li::before{content:counter(s); font-family:var(--f-disp); font-size:.8rem; color:var(--muted); width:22px; height:22px; border-radius:6px; border:1px solid var(--line); display:grid; place-items:center}
+.steps .sd{font-size:.88rem; color:var(--muted)}
+.steps .sd .m{font-size:1.1em; color:var(--ink)}
+.steps .se{font-size:1.2rem; overflow-x:auto; padding-block:4px 2px}
+.steps .bs{font-size:1.15rem; overflow-x:auto; padding-block:2px}
+
+/* Overlays / Seiten */
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:18px}
+.center{text-align:center}
+.big{font-family:var(--f-disp); font-size:clamp(2.2rem, 10vw, 3.4rem); font-weight:700; line-height:1}
+.kv{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-block:14px}
+.kv div{background:var(--panel-2); border-radius:10px; padding:10px 6px; text-align:center}
+.kv b{display:block; font-family:var(--f-disp); font-size:1.35rem; font-variant-numeric:tabular-nums}
+.kv span{font-size:.74rem; color:var(--muted)}
+.preview{list-style:none; margin:10px 0 16px; padding:0; display:grid; gap:6px; text-align:left}
+.preview li{display:flex; gap:10px; align-items:center; font-size:.95rem; padding:8px 10px; background:var(--panel-2); border-radius:10px}
+.preview li::before{content:""; width:8px; height:8px; border-radius:2px; background:var(--sig); flex:none}
+.stack{display:grid; gap:10px}
+.toplink{display:flex; align-items:center; gap:10px; margin-bottom:14px}
+.toplink h2{font-size:1.5rem}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.tg{padding:9px 14px; border-radius:99px; border:1.5px solid var(--line); background:var(--panel); font-size:.92rem; min-height:42px}
+.tg[aria-pressed="true"]{background:var(--acc-soft); border-color:var(--acc); color:var(--ink); font-weight:600}
+.sec{margin-top:18px}
+.sec>.label{display:block; margin-bottom:8px}
+.lib{display:grid; gap:8px}
+.lib details{background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden}
+.lib summary{list-style:none; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer}
+.lib summary::-webkit-details-marker{display:none}
+.lib summary .nm{font-size:.82rem; color:var(--muted)}
+.lib summary .m{font-size:1.25rem; overflow-x:auto; max-width:100%}
+.lib summary>div{min-width:0}
+.lib .alts{padding:4px 14px 14px; display:grid; gap:6px; border-top:1px solid var(--line); padding-top:10px}
+.lib .alts .m{font-size:1.2rem; overflow-x:auto; padding:4px 0}
+.lib h3{font-size:1rem; margin-top:10px; color:var(--muted)}
+.wronglist{display:grid; gap:6px; margin-top:8px; text-align:left}
+.wronglist div{background:var(--panel-2); border-radius:10px; padding:8px 12px; font-size:1.15rem; overflow-x:auto}
+.confirm{position:fixed; inset:auto 0 0 0; padding:16px max(16px, env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px, env(safe-area-inset-left,0px)); background:var(--panel); border-top:1px solid var(--line); display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; z-index:20; box-shadow:0 -8px 30px rgba(0,0,0,.12)}
+.confirm p{flex:1 1 200px; font-weight:500}
+
+.pop{animation:pop .35s ease}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.96); opacity:.4} 100%{transform:none; opacity:1}}
+@keyframes shake{0%,100%{transform:none} 20%{transform:translateX(-7px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(3px)}}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+@media (max-width:380px){ .modes{grid-template-columns:1fr} .mode{min-height:0} }
+@media (min-width:700px){ body{font-size:17px} .formula{font-size:2.5rem} .opt{font-size:1.5rem} }
+</style>
+
+<div id="app"><main id="view"></main></div>
+<div id="confirm" class="confirm" hidden></div>
+
+<script>
+'use strict';
+/* ================= Speicher ================= */
+const store={
+  get(k,d){ try{ const v=localStorage.getItem('ulab_'+k); return v==null?d:JSON.parse(v) }catch(e){ return d } },
+  set(k,v){ try{ localStorage.setItem('ulab_'+k, JSON.stringify(v)) }catch(e){} }
+};
+const ALL_TOPICS=['grund','leist','leit','ac','cl','mag','masch','schalt'];
+const TOPICS={grund:'Grundlagen',leist:'Leistung & Energie',leit:'Leitungen & Widerstand',ac:'Wechselstrom',cl:'Kondensator & Spule',mag:'Magnetismus & Feld',masch:'Trafo & Maschinen',schalt:'Schaltungen'};
+let settings=Object.assign({topics:ALL_TOPICS.slice(), sound:true}, store.get('settings',{}));
+let stats=Object.assign({best:{}, bestScore:{}, solved:0, wrong:0, miss:{}}, store.get('stats',{}));
+const saveSettings=()=>store.set('settings',settings);
+const saveStats=()=>store.set('stats',stats);
+
+/* ================= Hilfen ================= */
+const $=s=>document.querySelector(s);
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a};
+const gcd=(a,b)=>{a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b]} return a||1};
+const lcm=(a,b)=>Math.abs(a*b)/gcd(a,b);
+
+/* ================= Mathe-HTML ================= */
+const DOT='<span class="op">·</span>';
+const fr=(a,b)=>`<span class="fr"><span class="fn">${a}</span><span class="fd">${b}</span></span>`;
+const rt=a=>`<span class="rt"><svg class="rsv" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0.6 11.6 L3 10.2 L5.9 19.2 L10 0.6"/></svg><span class="ri">${a}</span></span>`;
+const pw=(a,p)=>`${a}<sup>${p}</sup>`;
+const o=s=>`<span class="op">${s}</span>`;
+const pr=a=>`<span class="pa">(</span>${a}<span class="pa">)</span>`;
+const eqH=(l,r)=>`${l}<span class="es">=</span>${r}`;
+const M_=h=>`<span class="m">${h}</span>`;
+const mul=(...a)=>a.join(DOT);
+const pl=(...a)=>a.join(o('+'));
+const mi=(...a)=>a.join(o('−'));
+
+/* ================= Größen ================= */
+const V={};
+function dv(k,s,i,name,unit,gen,opt){ V[k]=Object.assign({k,s,i,name,unit,gen},opt||{}) }
+dv('U','U','','Spannung','V',[5,400,5]);
+dv('I','I','','Stromstärke','A',[0.5,20,0.5]);
+dv('R','R','','Widerstand','Ω',[10,1000,10]);
+dv('G','G','','Leitwert','S',[0.001,0.1,0.001]);
+dv('P','P','','Wirkleistung','W',[50,5000,50]);
+dv('W','W','','Energie','J',[100,50000,100]);
+dv('t','t','','Zeit','s',[1,600,1]);
+dv('Q','Q','','Ladung','C',[0.01,2,0.01]);
+dv('T','T','','Periodendauer','s',[0.0002,0.02,0.0002]);
+dv('f','f','','Frequenz','Hz',[50,5000,50]);
+dv('C','C','','Kapazität','F',null,{list:[1e-7,2.2e-7,4.7e-7,1e-6,2.2e-6,4.7e-6,1e-5,2.2e-5,4.7e-5,1e-4]});
+dv('L','L','','Induktivität','H',null,{list:[0.01,0.022,0.047,0.1,0.22,0.47,1]});
+dv('XL','X','L','induktiver Blindwiderstand','Ω',[10,500,10]);
+dv('XC','X','C','kapazitiver Blindwiderstand','Ω',[10,500,10]);
+dv('X','X','','Blindwiderstand','Ω',[10,300,10]);
+dv('Z','Z','','Scheinwiderstand','Ω',[10,500,10]);
+dv('E','E','','elektrische Feldstärke','V/m',[1000,100000,1000]);
+dv('d','d','','Plattenabstand','m',[0.0005,0.01,0.0005]);
+dv('eta','η','','Wirkungsgrad','',[0.7,0.98,0.01],{np:1});
+dv('Pab','P','ab','abgegebene Leistung','W',[100,5000,100]);
+dv('Pzu','P','zu','zugeführte Leistung','W',[100,5000,100]);
+dv('Pv','P','V','Verlustleistung','W',[10,1000,10]);
+dv('omega','ω','','Kreisfrequenz','1/s',[100,10000,100],{np:1});
+dv('rho','ρ','','spezifischer Widerstand','Ω·mm²/m',null,{list:[0.0178,0.0286,0.0556],np:1});
+dv('l','l','','Leiterlänge','m',[5,200,5],{np:1});
+dv('lm','l','','Feldlinien-/Leiterlänge im Feld','m',[0.05,0.5,0.01]);
+dv('A','A','','Leiterquerschnitt','mm²',null,{list:[1.5,2.5,4,6,10,16,25],np:1});
+dv('Am','A','','Fläche','m²',[0.0001,0.002,0.0001],{np:1});
+dv('kappa','κ','','Leitfähigkeit','m/(Ω·mm²)',null,{list:[56,35],np:1});
+dv('n','n','','Drehzahl','1/min',[500,3000,50],{np:1});
+dv('p','p','','Polpaarzahl','',[1,4,1],{np:1,int:1});
+dv('Phi','Φ','','magnetischer Fluss','Wb',[0.0001,0.01,0.0001]);
+dv('dPhi','','','Flussänderung','Wb',[0.0001,0.005,0.0001],{raw:'Δ<i>Φ</i>'});
+dv('dt','','','Zeitspanne','s',[0.01,0.5,0.01],{raw:'Δ<i>t</i>'});
+dv('B','B','','Flussdichte','T',[0.1,1.6,0.1]);
+dv('F','F','','Kraft','N',[0.1,50,0.1]);
+dv('N','N','','Windungszahl','',[50,500,50],{np:1,int:1});
+dv('N1','N','1','Primärwindungszahl','',[100,2000,50],{np:1,int:1});
+dv('N2','N','2','Sekundärwindungszahl','',[20,1000,10],{np:1,int:1});
+dv('U1','U','1','Primärspannung','V',[100,690,10]);
+dv('U2','U','2','Spannung U₂','V',[6,400,2]);
+dv('I1','I','1','Strom I₁','A',[0.5,20,0.5]);
+dv('I2','I','2','Strom I₂','A',[0.5,20,0.5]);
+dv('Iges','I','ges','Gesamtstrom','A',[1,30,0.5]);
+dv('tau','τ','','Zeitkonstante','s',[0.001,1,0.001]);
+dv('S','S','','Scheinleistung','VA',[100,10000,100]);
+dv('cosphi','','','Leistungsfaktor','',[0.6,0.95,0.05],{raw:'cos <i>φ</i>',np:1});
+dv('sinphi','','','sin φ','',[0.3,0.8,0.05],{raw:'sin <i>φ</i>',np:1});
+dv('Qb','Q','','Blindleistung','var',[100,5000,100]);
+dv('Ui','U','i','induzierte Spannung','V',[1,400,1]);
+dv('H','H','','magnetische Feldstärke','A/m',[100,2000,100]);
+dv('mur','μ','r','Permeabilitätszahl','',null,{list:[1,100,500,1000],np:1});
+dv('epsr','ε','r','Permittivitätszahl','',null,{list:[1,2.2,4,6],np:1});
+dv('f0','f','0','Resonanzfrequenz','Hz',[50,5000,10]);
+dv('dU','','','Spannungsfall','V',[1,20,0.5],{raw:'Δ<i>U</i>'});
+dv('Rges','R','ges','Gesamtwiderstand','Ω',[10,1000,10]);
+dv('R1','R','1','Widerstand R₁','Ω',[10,1000,10]);
+dv('R2','R','2','Widerstand R₂','Ω',[10,1000,10]);
+dv('R3','R','3','Widerstand R₃','Ω',[10,1000,10]);
+dv('Rth','R','ϑ','Warmwiderstand','Ω',[10,500,1]);
+dv('R20','R','20','Kaltwiderstand bei 20 °C','Ω',[10,500,5]);
+dv('alpha','α','','Temperaturbeiwert','1/K',null,{list:[0.0039,0.0043,0.004],np:1});
+dv('dth','','','Temperaturdifferenz','K',[10,80,5],{raw:'Δ<i>ϑ</i>',np:1});
+dv('U0','U','0','Quellenspannung','V',[6,48,1]);
+dv('UK','U','K','Klemmenspannung','V',[5,45,1]);
+dv('Ri','R','i','Innenwiderstand','Ω',[0.1,1,0.1]);
+dv('K','K','','Energiekosten','€',[1,200,1],{np:1});
+dv('k','k','','Arbeitspreis','€/kWh',null,{list:[0.28,0.32,0.35,0.4],np:1});
+dv('Wk','W','','Energie','kWh',[10,800,10],{np:1});
+dv('ue','ü','','Übersetzungsverhältnis','',[2,20,1],{np:1});
+dv('pi','','','Kreiszahl','',null,{c:1,val:Math.PI,raw:'π'});
+dv('mu0','μ','0','magnetische Feldkonstante','Vs/(Am)',null,{c:1,val:4*Math.PI*1e-7});
+dv('eps0','ε','0','elektrische Feldkonstante','As/(Vm)',null,{c:1,val:8.854e-12});
+
+const isNum=k=>/^\d+$/.test(k);
+const isConst=k=>isNum(k)||!!(V[k]&&V[k].c);
+function vh(k){ if(isNum(k)) return k; const v=V[k]; if(v.raw) return v.raw; return `<i>${v.s}</i>`+(v.i?`<sub>${v.i}</sub>`:''); }
+function rnd(k){ const v=V[k]; if(v.list) return pick(v.list); const [a,b,s]=v.gen; const n=Math.round((b-a)/s); return +(a+s*ri(0,n)).toPrecision(6); }
+function constVal(k){ return isNum(k)? +k : V[k].val; }
+
+/* ---------- Zahlen formatieren ---------- */
+const PRE=[[1e6,'M'],[1e3,'k'],[1,''],[1e-3,'m'],[1e-6,'µ'],[1e-9,'n'],[1e-12,'p']];
+function de(n){ let s=String(n); if(/e/.test(s)) s=n.toFixed(12).replace(/0+$/,''); return s.replace('-','−').replace('.',','); }
+function sig(v,d){ return +(+v).toPrecision(d); }
+function fmtVal(v,k,digits){
+  digits=digits||4; const def=V[k]||{};
+  if(def.int) return {txt:de(Math.round(v)), mant:Math.round(v), fac:1, pre:'', unit:def.unit||''};
+  if(def.np || !def.unit){ const m=sig(v,digits); return {txt:de(m), mant:m, fac:1, pre:'', unit:def.unit||''}; }
+  const a=Math.abs(v); let p=PRE[PRE.length-1];
+  for(const q of PRE){ if(a>=q[0]*0.9995){ p=q; break; } }
+  const m=sig(v/p[0],digits);
+  return {txt:de(m), mant:m, fac:p[0], pre:p[1], unit:def.unit};
+}
+function fmtSci(v){
+  const a=Math.abs(v);
+  if(a===0) return '0';
+  if(a>=0.01 && a<1e5) return de(sig(v,4));
+  let e=Math.floor(Math.log10(a)); e=e-((e%3)+3)%3; const m=sig(v/Math.pow(10,e),4);
+  return `${de(m)}${DOT}10<sup>${String(e).replace('-','−')}</sup>`;
+}
+const unitTxt=(f)=>(f.pre+f.unit).trim();
+
+/* ================= Monom-Formeln ================= */
+function rank(k){ return isNum(k)?0: isConst(k)?1:2 }
+let SUBST=null;
+function tokHTML(k,p){
+  let base;
+  if(SUBST && !isConst(k)) { base=fmtSci(SUBST[k]); if(p>1||/sup|−/.test(base)) base=pr(base); }
+  else if(SUBST && k==='mu0') base=pr(fmtSci(V.mu0.val));
+  else if(SUBST && k==='eps0') base=pr(fmtSci(V.eps0.val));
+  else base=vh(k);
+  if(p===1) return base;
+  if(!SUBST && (k==='cosphi'||k==='sinphi')) return `${k==='cosphi'?'cos':'sin'}<sup>${p}</sup> <i>φ</i>`;
+  return base+`<sup>${p}</sup>`;
+}
+function groupHTML(map){
+  const ks=Object.keys(map).filter(k=>map[k]>1e-9).sort((a,b)=>rank(a)-rank(b));
+  let nv=1, nr=1; const items=[], rs=[];
+  for(const k of ks){
+    const e=map[k], ip=Math.floor(e+1e-9), half=(e-ip)>0.25;
+    if(isNum(k)){ nv*=Math.pow(+k,ip); if(half) nr*=+k; continue; }
+    if(ip>0) items.push({h:tokHTML(k,ip), pi:k==='pi'});
+    if(half) rs.push(tokHTML(k,1));
+  }
+  const out=[];
+  if(nv!==1) out.push({h:String(nv), num:1});
+  if(nr!==1 && !rs.length) out.push({h:rt(String(nr))});
+  out.push(...items);
+  if(rs.length) out.push({h:rt((nr!==1?[String(nr)]:[]).concat(rs).join(DOT))});
+  if(!out.length) return '1';
+  return out.map((it,i)=> i===0? it.h : ((it.pi && out[i-1].num && !SUBST)?'':DOT)+it.h).join('');
+}
+function fracOf(map){
+  const num={}, den={};
+  for(const k in map){ if(map[k]>1e-9) num[k]=map[k]; else if(map[k]<-1e-9) den[k]=-map[k]; }
+  const n=groupHTML(num);
+  return Object.keys(den).length? fr(n, groupHTML(den)) : n;
+}
+function displayMap(map){
+  const ks=Object.keys(map).filter(k=>Math.abs(map[k])>1e-9);
+  const allHalf=ks.length>0 && ks.every(k=>Math.abs(Math.abs(map[k])%1-0.5)<1e-9);
+  if(allHalf){ const D={}; ks.forEach(k=>D[k]=map[k]*2); return {D, root:true}; }
+  const D={}; ks.forEach(k=>D[k]=map[k]); return {D, root:false};
+}
+function monoHTML(map){ const {D,root}=displayMap(map); return root? rt(fracOf(D)) : fracOf(D); }
+function mkey(map){ return Object.keys(map).filter(k=>Math.abs(map[k])>1e-9).sort().map(k=>k+':'+(+map[k].toFixed(3))).join('|'); }
+function solveMono(f,x){
+  if(x===f.lhs) return Object.assign({},f.rhs);
+  const E={}; E[f.lhs]=1; for(const k in f.rhs) E[k]=(E[k]||0)-f.rhs[k];
+  const ex=E[x], res={};
+  for(const k in E){ if(k!==x){ const v=-E[k]/ex; if(Math.abs(v)>1e-9) res[k]=v; } }
+  return res;
+}
+function evalMap(map, vals){ let r=1; for(const k in map){ const b=isConst(k)?constVal(k):vals[k]; r*=Math.pow(b,map[k]); } return r; }
+function monoWrongs(map){
+  const ks=Object.keys(map), out=[], singles=[];
+  const add=(m,s)=>{ const c={}; for(const k in m) if(Math.abs(m[k])>1e-9) c[k]=m[k]; if(!Object.keys(c).length) return; (s?singles:out).push(c); };
+  ks.forEach(k=>add(Object.assign({},map,{[k]:-map[k]}),1));
+  const neg={}; ks.forEach(k=>neg[k]=-map[k]); add(neg);
+  const hasHalf=ks.some(k=>Math.abs(map[k]%1)>1e-9);
+  if(hasHalf){ const d={}; ks.forEach(k=>d[k]=map[k]*2); add(d,1); ks.forEach(k=>{ if(Math.abs(map[k]%1)>1e-9) add(Object.assign({},map,{[k]:map[k]*2})) }); }
+  else {
+    const h={}; ks.forEach(k=>h[k]=map[k]/2); add(h);
+    ks.forEach(k=>{ if(Math.abs(map[k])===2) add(Object.assign({},map,{[k]:map[k]/2}),1); else if(Math.abs(map[k])===1 && !isConst(k)) add(Object.assign({},map,{[k]:map[k]*2})); });
+  }
+  ks.filter(isConst).forEach(k=>{ const m=Object.assign({},map); delete m[k]; add(m,1); });
+  for(let i=0;i<ks.length;i++) for(let j=i+1;j<ks.length;j++){ add(Object.assign({},map,{[ks[i]]:-map[ks[i]],[ks[j]]:-map[ks[j]]})); }
+  const seen=new Set([mkey(map)]); const uniq=a=>a.filter(m=>{ const k=mkey(m); if(seen.has(k)) return false; seen.add(k); return true; });
+  return {singles:uniq(shuffle(singles)), others:uniq(shuffle(out))};
+}
+function eqMaps(L,R){ return eqH(monoHTML(L), monoHTML(R)); }
+function monoSteps(f,x){
+  let L={[f.lhs]:1}, R=Object.assign({},f.rhs); const st=[];
+  let side= (x in L)?'L':'R';
+  const xs=()=> side==='L'?L:R;
+  const others=Object.keys(xs()).filter(k=>k!==x);
+  const groups=[]; const cs=others.filter(isConst); if(cs.length) groups.push(cs); others.filter(k=>!isConst(k)).forEach(k=>groups.push([k]));
+  for(const g of groups){
+    const pos={}, neg={}; g.forEach(k=>{ const e=xs()[k]; if(e>0) pos[k]=e; else neg[k]=-e; });
+    const t=[]; if(Object.keys(pos).length) t.push('÷ '+M_(groupHTML(pos))); if(Object.keys(neg).length) t.push('· '+M_(groupHTML(neg)));
+    const es={}; g.forEach(k=>es[k]=xs()[k]);
+    for(const k of g){ for(const m of [L,R]){ m[k]=(m[k]||0)-es[k]; if(Math.abs(m[k])<1e-9) delete m[k]; } }
+    st.push({t:'Beide Seiten '+t.join(' und '), e:eqMaps(L,R)});
+  }
+  if(side==='R'){ [L,R]=[R,L]; side='L'; st.push({t:'Seiten tauschen', e:eqMaps(L,R)}); }
+  let ex=L[x];
+  if(ex<0){ L={[x]:-ex}; const n={}; for(const k in R) n[k]=-R[k]; R=n; ex=-ex; st.push({t:'Kehrwert beider Seiten bilden', e:eqMaps(L,R)}); }
+  if(Math.abs(ex-1)>1e-9){ const n={}; for(const k in R) n[k]=R[k]/ex; R=n; L={[x]:1};
+    st.push({t: Math.abs(ex-2)<1e-9?'Wurzel ziehen': Math.abs(ex-0.5)<1e-9?'Beide Seiten quadrieren':'Potenzieren', e:eqMaps(L,R)}); }
+  return st;
+}
+
+/* ================= Formelbank ================= */
+const F=[];
+function Mf(id,name,topic,tier,lhs,rhs,opt){ F.push(Object.assign({id,name,topic,tier,lhs,rhs,mono:1},opt||{})); }
+Mf('ohm','Ohmsches Gesetz','grund',1,'U',{R:1,I:1});
+Mf('leitwert','Leitwert','grund',1,'G',{R:-1});
+Mf('ladung','Elektrische Ladung','grund',1,'Q',{I:1,t:1});
+Mf('pui','Elektrische Leistung','leist',1,'P',{U:1,I:1});
+Mf('arbeit','Elektrische Arbeit','leist',1,'W',{P:1,t:1});
+Mf('kosten','Energiekosten','leist',1,'K',{Wk:1,k:1});
+Mf('periode','Frequenz und Periodendauer','ac',1,'f',{T:-1});
+Mf('kap','Kapazität','cl',1,'C',{Q:1,U:-1});
+Mf('efeld','Elektrische Feldstärke','mag',1,'E',{U:1,d:-1});
+Mf('eta','Wirkungsgrad','leist',1,'eta',{Pab:1,Pzu:-1},{dep:'Pzu'});
+Mf('schein','Scheinleistung','ac',1,'S',{U:1,I:1});
+Mf('ue','Übersetzungsverhältnis','masch',1,'ue',{N1:1,N2:-1},{dep:'N1'});
+Mf('wui','Arbeit aus U, I und t','leist',2,'W',{U:1,I:1,t:1});
+Mf('omega','Kreisfrequenz','ac',2,'omega',{2:1,pi:1,f:1});
+Mf('rho','Leiterwiderstand mit ρ','leit',2,'R',{rho:1,l:1,A:-1});
+Mf('kappa','Leiterwiderstand mit κ','leit',2,'R',{l:1,kappa:-1,A:-1});
+Mf('xl','Induktiver Blindwiderstand','ac',2,'XL',{2:1,pi:1,f:1,L:1});
+Mf('drehzahl','Drehfelddrehzahl','masch',2,'n',{60:1,f:1,p:-1});
+Mf('fluss','Magnetischer Fluss','mag',2,'Phi',{B:1,Am:1});
+Mf('kraft','Kraft auf einen Leiter im Magnetfeld','mag',2,'F',{B:1,I:1,lm:1});
+Mf('trafoU','Trafo: Spannungen','masch',2,'U1',{U2:1,N1:1,N2:-1});
+Mf('trafoI','Trafo: Ströme','masch',2,'I1',{I2:1,N2:1,N1:-1});
+Mf('tauRC','Zeitkonstante RC-Glied','cl',2,'tau',{R:1,C:1});
+Mf('tauRL','Zeitkonstante RL-Glied','cl',2,'tau',{L:1,R:-1});
+Mf('cosphi','Leistungsfaktor','ac',2,'cosphi',{P:1,S:-1},{dep:'S'});
+Mf('pcos','Wirkleistung bei Wechselstrom','ac',2,'P',{U:1,I:1,cosphi:1});
+Mf('ui','Induktionsgesetz','mag',3,'Ui',{N:1,dPhi:1,dt:-1});
+Mf('hspule','Magnetische Feldstärke einer Spule','mag',3,'H',{I:1,N:1,lm:-1});
+Mf('pir','Leistung aus I und R','leist',3,'P',{I:2,R:1});
+Mf('pur','Leistung aus U und R','leist',3,'P',{U:2,R:-1});
+Mf('wc','Energie im Kondensator','cl',3,'W',{2:-1,C:1,U:2});
+Mf('wl','Energie in der Spule','cl',3,'W',{2:-1,L:1,I:2});
+Mf('bfeld','Flussdichte','mag',3,'B',{mu0:1,mur:1,H:1});
+Mf('qb','Blindleistung','ac',3,'Qb',{U:1,I:1,sinphi:1});
+Mf('xc','Kapazitiver Blindwiderstand','ac',4,'XC',{2:-1,pi:-1,f:-1,C:-1});
+Mf('thomson','Resonanzfrequenz (Thomson)','ac',4,'f0',{2:-1,pi:-1,L:-0.5,C:-0.5});
+Mf('du','Spannungsfall Wechselstromleitung','leit',4,'dU',{2:1,l:1,I:1,kappa:-1,A:-1});
+Mf('p3','Drehstrom-Wirkleistung','masch',4,'P',{3:0.5,U:1,I:1,cosphi:1});
+Mf('lspule','Induktivität einer Zylinderspule','cl',4,'L',{mu0:1,mur:1,N:2,Am:1,lm:-1});
+Mf('cplatte','Plattenkondensator','cl',4,'C',{eps0:1,epsr:1,Am:1,d:-1});
+
+/* Formeln mit Summen / Klammern – Lösungen von Hand */
+function Hw(id,name,topic,tier,lhs,html,sol,gen){ F.push({id,name,topic,tier,lhs,html,sol,gen,mono:0}); }
+(()=>{
+  const x=vh;
+  const Rg=x('Rges'),R1=x('R1'),R2=x('R2'),R3=x('R3'),I1=x('I1'),I2=x('I2'),Ig=x('Iges');
+  const g=rnd;
+  Hw('reihe','Reihenschaltung','schalt',2,'Rges', eqH(Rg, pl(R1,R2,R3)), {
+    R2:{h:mi(Rg,R1,R3), w:[pl(Rg,R1,R3), mi(pl(R1,R3),Rg), pl(mi(Rg,R1),R3), fr(Rg,pl(R1,R3))],
+      st:[['Beide Seiten − '+M_(R1)+' − '+M_(R3), eqH(mi(Rg,R1,R3),R2)],['Seiten tauschen',null]], fn:v=>v.Rges-v.R1-v.R3}
+  }, ()=>{ const v={R1:g('R1'),R2:g('R2'),R3:g('R3')}; v.Rges=v.R1+v.R2+v.R3; return v; });
+
+  Hw('knoten','Knotenregel','schalt',1,'Iges', eqH(Ig, pl(I1,I2)), {
+    I2:{h:mi(Ig,I1), w:[pl(Ig,I1), mi(I1,Ig), fr(Ig,I1), mul(Ig,I1)],
+      st:[['Beide Seiten − '+M_(I1), eqH(mi(Ig,I1),I2)],['Seiten tauschen',null]], fn:v=>v.Iges-v.I1}
+  }, ()=>{ const v={I1:g('I1'),I2:g('I2')}; v.Iges=v.I1+v.I2; return v; });
+
+  Hw('parallel','Parallelschaltung zweier Widerstände','schalt',4,'Rges', eqH(Rg, fr(mul(R1,R2),pl(R1,R2))), {
+    R1:{h:fr(mul(Rg,R2),mi(R2,Rg)), w:[fr(mul(Rg,R2),mi(Rg,R2)), fr(mi(R2,Rg),mul(Rg,R2)), fr(mul(Rg,R2),pl(Rg,R2)), mi(R2,Rg), fr(pl(Rg,R2),R2)],
+      st:[['Beide Seiten · '+M_(pr(pl(R1,R2))), eqH(mul(Rg,pr(pl(R1,R2))), mul(R1,R2))],
+          ['Klammer ausmultiplizieren', eqH(pl(mul(Rg,R1),mul(Rg,R2)), mul(R1,R2))],
+          ['Beide Seiten − '+M_(mul(Rg,R1)), eqH(mul(Rg,R2), mi(mul(R1,R2),mul(Rg,R1)))],
+          [M_(R1)+' ausklammern', eqH(mul(Rg,R2), mul(R1,pr(mi(R2,Rg))))],
+          ['Beide Seiten ÷ '+M_(pr(mi(R2,Rg)))+', Seiten tauschen', null]],
+      fn:v=>v.Rges*v.R2/(v.R2-v.Rges)}
+  }, ()=>{ const v={R1:g('R1'),R2:g('R2')}; v.Rges=v.R1*v.R2/(v.R1+v.R2); return v; });
+
+  Hw('kehrwert','Parallelschaltung mit Kehrwerten','schalt',3,'Rges', eqH(fr(1,Rg), pl(fr(1,R1),fr(1,R2))), {
+    Rges:{h:fr(1,pl(fr(1,R1),fr(1,R2))), w:[pl(R1,R2), pl(fr(1,R1),fr(1,R2)), fr(1,pl(R1,R2)), fr(pl(R1,R2),mul(R1,R2))],
+      st:[['Kehrwert beider Seiten bilden', null]], fn:v=>1/(1/v.R1+1/v.R2)},
+    R1:{h:fr(1,mi(fr(1,Rg),fr(1,R2))), w:[fr(1,pl(fr(1,Rg),fr(1,R2))), mi(fr(1,Rg),fr(1,R2)), mi(Rg,R2), fr(1,mi(fr(1,R2),fr(1,Rg)))],
+      st:[['Beide Seiten − '+M_(fr(1,R2)), eqH(mi(fr(1,Rg),fr(1,R2)), fr(1,R1))],['Kehrwert beider Seiten, Seiten tauschen', null]], fn:v=>1/(1/v.Rges-1/v.R2)}
+  }, ()=>{ const v={R1:g('R1'),R2:g('R2')}; v.Rges=v.R1*v.R2/(v.R1+v.R2); return v; });
+
+  const Rt=x('Rth'),R0=x('R20'),al=x('alpha'),dth=x('dth'), K1=pl('1',mul(al,dth));
+  Hw('temp','Temperaturabhängiger Widerstand','leit',4,'Rth', eqH(Rt, mul(R0,pr(K1))), {
+    R20:{h:fr(Rt,K1), w:[mul(Rt,pr(K1)), fr(Rt,mul(al,dth)), fr(K1,Rt), fr(mi(Rt,'1'),mul(al,dth))],
+      st:[['Beide Seiten ÷ '+M_(pr(K1)), eqH(fr(Rt,K1),R0)],['Seiten tauschen',null]], fn:v=>v.Rth/(1+v.alpha*v.dth)},
+    dth:{h:fr(mi(Rt,R0),mul(al,R0)), w:[fr(mi(Rt,R0),al), mul(pr(mi(fr(Rt,R0),'1')),al), fr(mi(R0,Rt),mul(al,R0)), fr(mul(pr(mi(Rt,R0)),al),R0), fr(Rt,mul(al,R0))],
+      st:[['Beide Seiten ÷ '+M_(R0), eqH(fr(Rt,R0),K1)],['Beide Seiten − 1', eqH(mi(fr(Rt,R0),'1'),mul(al,dth))],['Beide Seiten ÷ '+M_(al), eqH(fr(mi(fr(Rt,R0),'1'),al),dth)],['Seiten tauschen, auf einen Bruchstrich bringen',null]],
+      fn:v=>(v.Rth-v.R20)/(v.alpha*v.R20)},
+    alpha:{h:fr(mi(Rt,R0),mul(R0,dth)), w:[fr(mi(Rt,R0),dth), fr(mul(pr(mi(Rt,R0)),dth),R0), fr(mi(R0,Rt),mul(R0,dth)), fr(Rt,mul(R0,dth))],
+      st:[['Beide Seiten ÷ '+M_(R0), eqH(fr(Rt,R0),K1)],['Beide Seiten − 1', eqH(mi(fr(Rt,R0),'1'),mul(al,dth))],['Beide Seiten ÷ '+M_(dth), eqH(fr(mi(fr(Rt,R0),'1'),dth),al)],['Seiten tauschen, auf einen Bruchstrich bringen',null]],
+      fn:v=>(v.Rth-v.R20)/(v.R20*v.dth)}
+  }, ()=>{ const v={R20:g('R20'),alpha:g('alpha'),dth:g('dth')}; v.Rth=v.R20*(1+v.alpha*v.dth); return v; });
+
+  const Z=x('Z'),Rr=x('R'),X=x('X');
+  Hw('zschein','Scheinwiderstand','ac',3,'Z', eqH(Z, rt(pl(pw(Rr,2),pw(X,2)))), {
+    R:{h:rt(mi(pw(Z,2),pw(X,2))), w:[rt(pl(pw(Z,2),pw(X,2))), mi(Z,X), rt(mi(pw(X,2),pw(Z,2))), mi(pw(Z,2),pw(X,2))],
+      st:[['Beide Seiten quadrieren', eqH(pw(Z,2),pl(pw(Rr,2),pw(X,2)))],['Beide Seiten − '+M_(pw(X,2)), eqH(mi(pw(Z,2),pw(X,2)),pw(Rr,2))],['Wurzel ziehen, Seiten tauschen',null]], fn:v=>Math.sqrt(v.Z*v.Z-v.X*v.X)},
+    X:{h:rt(mi(pw(Z,2),pw(Rr,2))), w:[rt(pl(pw(Z,2),pw(Rr,2))), mi(Z,Rr), rt(mi(pw(Rr,2),pw(Z,2))), mi(pw(Z,2),pw(Rr,2))],
+      st:[['Beide Seiten quadrieren', eqH(pw(Z,2),pl(pw(Rr,2),pw(X,2)))],['Beide Seiten − '+M_(pw(Rr,2)), eqH(mi(pw(Z,2),pw(Rr,2)),pw(X,2))],['Wurzel ziehen, Seiten tauschen',null]], fn:v=>Math.sqrt(v.Z*v.Z-v.R*v.R)}
+  }, ()=>{ const v={R:g('R'),X:g('X')}; v.Z=Math.sqrt(v.R*v.R+v.X*v.X); return v; });
+
+  const S=x('S'),P=x('P'),Qb=x('Qb');
+  Hw('sleist','Leistungsdreieck','ac',3,'S', eqH(S, rt(pl(pw(P,2),pw(Qb,2)))), {
+    P:{h:rt(mi(pw(S,2),pw(Qb,2))), w:[rt(pl(pw(S,2),pw(Qb,2))), mi(S,Qb), rt(mi(pw(Qb,2),pw(S,2))), mi(pw(S,2),pw(Qb,2))],
+      st:[['Beide Seiten quadrieren', eqH(pw(S,2),pl(pw(P,2),pw(Qb,2)))],['Beide Seiten − '+M_(pw(Qb,2)), eqH(mi(pw(S,2),pw(Qb,2)),pw(P,2))],['Wurzel ziehen, Seiten tauschen',null]], fn:v=>Math.sqrt(v.S*v.S-v.Qb*v.Qb)},
+    Qb:{h:rt(mi(pw(S,2),pw(P,2))), w:[rt(pl(pw(S,2),pw(P,2))), mi(S,P), rt(mi(pw(P,2),pw(S,2))), mi(pw(S,2),pw(P,2))],
+      st:[['Beide Seiten quadrieren', eqH(pw(S,2),pl(pw(P,2),pw(Qb,2)))],['Beide Seiten − '+M_(pw(P,2)), eqH(mi(pw(S,2),pw(P,2)),pw(Qb,2))],['Wurzel ziehen, Seiten tauschen',null]], fn:v=>Math.sqrt(v.S*v.S-v.P*v.P)}
+  }, ()=>{ const v={P:g('P'),Qb:g('Qb')}; v.S=Math.sqrt(v.P*v.P+v.Qb*v.Qb); return v; });
+
+  const U=x('U'),U2=x('U2');
+  Hw('teiler','Unbelasteter Spannungsteiler','schalt',4,'U2', eqH(U2, mul(U,fr(R2,pl(R1,R2)))), {
+    U:{h:fr(mul(U2,pr(pl(R1,R2))),R2), w:[fr(mul(U2,R2),pl(R1,R2)), mul(U2,pr(pl(R1,R2)),R2), fr(mul(U2,R1),R2), fr(pl(R1,R2),mul(U2,R2))],
+      st:[['Beide Seiten · '+M_(pr(pl(R1,R2))), eqH(mul(U2,pr(pl(R1,R2))),mul(U,R2))],['Beide Seiten ÷ '+M_(R2)+', Seiten tauschen',null]], fn:v=>v.U2*(v.R1+v.R2)/v.R2},
+    R1:{h:fr(mul(R2,pr(mi(U,U2))),U2), w:[fr(mul(R2,pr(mi(U2,U))),U2), fr(mul(R2,U),U2), pl(fr(mul(U,R2),U2),R2), fr(mul(R2,pr(mi(U,U2))),U)],
+      st:[['Beide Seiten · '+M_(pr(pl(R1,R2))), eqH(mul(U2,pr(pl(R1,R2))),mul(U,R2))],['Beide Seiten ÷ '+M_(U2), eqH(pl(R1,R2),fr(mul(U,R2),U2))],['Beide Seiten − '+M_(R2), eqH(R1,mi(fr(mul(U,R2),U2),R2))],['Auf einen Bruchstrich bringen, '+M_(R2)+' ausklammern',null]],
+      fn:v=>v.R2*(v.U-v.U2)/v.U2},
+    R2:{h:fr(mul(U2,R1),mi(U,U2)), w:[fr(mul(U2,R1),mi(U2,U)), fr(mul(U,R1),mi(U,U2)), fr(mul(pr(mi(U,U2)),R1),U2), fr(mul(U2,R1),U)],
+      st:[['Beide Seiten · '+M_(pr(pl(R1,R2))), eqH(pl(mul(U2,R1),mul(U2,R2)),mul(U,R2))],['Beide Seiten − '+M_(mul(U2,R2)), eqH(mul(U2,R1),mi(mul(U,R2),mul(U2,R2)))],[M_(R2)+' ausklammern', eqH(mul(U2,R1),mul(R2,pr(mi(U,U2))))],['Beide Seiten ÷ '+M_(pr(mi(U,U2)))+', Seiten tauschen',null]],
+      fn:v=>v.U2*v.R1/(v.U-v.U2)}
+  }, ()=>{ const v={U:ri(1,40)*10,R1:g('R1'),R2:g('R2')}; v.U2=v.U*v.R2/(v.R1+v.R2); return v; });
+
+  const UK=x('UK'),U0=x('U0'),I=x('I'),Ri=x('Ri');
+  Hw('klemme','Klemmenspannung einer Quelle','schalt',3,'UK', eqH(UK, mi(U0,mul(I,Ri))), {
+    U0:{h:pl(UK,mul(I,Ri)), w:[mi(UK,mul(I,Ri)), mi(mul(I,Ri),UK), mul(UK,I,Ri), fr(UK,mul(I,Ri))],
+      st:[['Beide Seiten + '+M_(mul(I,Ri)), eqH(pl(UK,mul(I,Ri)),U0)],['Seiten tauschen',null]], fn:v=>v.UK+v.I*v.Ri},
+    I:{h:fr(mi(U0,UK),Ri), w:[fr(mi(UK,U0),Ri), fr(pl(U0,UK),Ri), mi(fr(U0,Ri),UK), fr(Ri,mi(U0,UK))],
+      st:[['Beide Seiten + '+M_(mul(I,Ri))+' − '+M_(UK), eqH(mul(I,Ri),mi(U0,UK))],['Beide Seiten ÷ '+M_(Ri),null]], fn:v=>(v.U0-v.UK)/v.Ri},
+    Ri:{h:fr(mi(U0,UK),I), w:[fr(mi(UK,U0),I), fr(pl(U0,UK),I), mi(fr(U0,I),UK), fr(I,mi(U0,UK))],
+      st:[['Beide Seiten + '+M_(mul(I,Ri))+' − '+M_(UK), eqH(mul(I,Ri),mi(U0,UK))],['Beide Seiten ÷ '+M_(I)+', Seiten tauschen',null]], fn:v=>(v.U0-v.UK)/v.I}
+  }, ()=>{ const v={U0:ri(6,48),I:ri(1,10)/2,Ri:ri(1,10)/10}; v.UK=v.U0-v.I*v.Ri; return v; });
+
+  const et=x('eta'),Pab=x('Pab'),Pv=x('Pv');
+  Hw('etav','Wirkungsgrad mit Verlustleistung','leist',4,'eta', eqH(et, fr(Pab,pl(Pab,Pv))), {
+    Pab:{h:fr(mul(et,Pv),mi('1',et)), w:[fr(mul(et,Pv),mi(et,'1')), fr(Pv,mi('1',et)), mul(et,Pv), fr(mul(pr(mi('1',et)),Pv),et)],
+      st:[['Beide Seiten · '+M_(pr(pl(Pab,Pv))), eqH(mul(et,pr(pl(Pab,Pv))),Pab)],['Klammer ausmultiplizieren', eqH(pl(mul(et,Pab),mul(et,Pv)),Pab)],['Beide Seiten − '+M_(mul(et,Pab)), eqH(mul(et,Pv),mi(Pab,mul(et,Pab)))],[M_(Pab)+' ausklammern', eqH(mul(et,Pv),mul(Pab,pr(mi('1',et))))],['Beide Seiten ÷ '+M_(pr(mi('1',et)))+', Seiten tauschen',null]],
+      fn:v=>v.eta*v.Pv/(1-v.eta)},
+    Pv:{h:fr(mul(Pab,pr(mi('1',et))),et), w:[fr(mul(Pab,pr(mi(et,'1'))),et), fr(Pab,et), fr(mul(Pab,et),mi('1',et)), fr(mi('1',et),mul(et,Pab))],
+      st:[['Beide Seiten · '+M_(pr(pl(Pab,Pv))), eqH(mul(et,pr(pl(Pab,Pv))),Pab)],['Beide Seiten ÷ '+M_(et), eqH(pl(Pab,Pv),fr(Pab,et))],['Beide Seiten − '+M_(Pab), eqH(Pv,mi(fr(Pab,et),Pab))],['Auf einen Bruchstrich bringen, '+M_(Pab)+' ausklammern',null]],
+      fn:v=>v.Pab*(1-v.eta)/v.eta}
+  }, ()=>{ const v={Pab:g('Pab'),eta:ri(70,95)/100}; v.Pv=v.Pab*(1-v.eta)/v.eta; return v; });
+
+  const XL=x('XL'),XC=x('XC');
+  Hw('xges','Gesamt-Blindwiderstand','ac',2,'X', eqH(X, mi(XL,XC)), {
+    XL:{h:pl(X,XC), w:[mi(X,XC), mi(XC,X), mul(X,XC), fr(X,XC)],
+      st:[['Beide Seiten + '+M_(XC), eqH(pl(X,XC),XL)],['Seiten tauschen',null]], fn:v=>v.X+v.XC},
+    XC:{h:mi(XL,X), w:[mi(X,XL), pl(XL,X), fr(XL,X), mul(XL,X)],
+      st:[['Beide Seiten + '+M_(XC)+' − '+M_(X), null]], fn:v=>v.XL-v.X}
+  }, ()=>{ const v={XC:g('XC'),X:g('X')}; v.XL=v.X+v.XC; return v; });
+})();
+
+function fHTML(f){ return f.mono? eqH(vh(f.lhs), monoHTML(f.rhs)) : f.html; }
+function targets(f){ return f.mono? Object.keys(f.rhs).filter(k=>!isConst(k)) : Object.keys(f.sol); }
+const PAIRS=[]; F.forEach(f=>targets(f).forEach(x=>PAIRS.push({f,x,key:f.id+':'+x})));
+function solHTML(f,x){ return f.mono? monoHTML(solveMono(f,x)) : f.sol[x].h; }
+function solSteps(f,x){
+  if(f.mono) return monoSteps(f,x);
+  return f.sol[x].st.map(([t,e])=>({t, e: e||eqH(vh(x), f.sol[x].h)}));
+}
+
+/* ================= Brüche ================= */
+class Fr{ constructor(n,d){ d=d===undefined?1:d; if(d<0){n=-n; d=-d;} this.n=n; this.d=d; }
+  red(){ const g=gcd(this.n,this.d); return new Fr(this.n/g,this.d/g); }
+  eq(o){ return this.n*o.d===o.n*this.d; } isRed(){ return gcd(this.n,this.d)===1; } val(){ return this.n/this.d; } }
+const pn=n=>n<0?`(−${-n})`:String(n);
+function fh(f,paren){ const n=Math.abs(f.n); let c= f.d===1? String(n) : fr(n,f.d); if(f.n<0) c='−'+c; return (f.n<0&&paren)? pr(c):c; }
+function rf(maxD,improper){ for(;;){ const d=ri(2,Math.max(3,maxD)); const n=ri(1, improper? 2*d : d-1); const f=new Fr(n,d).red(); if(f.d>1) return f; } }
+function maybeNeg(f,lv,p){ return (lv>=p && Math.random()<0.3)? new Fr(-f.n,f.d) : f; }
+function redStep(raw,st){ const r=raw.red(); if(r.d!==raw.d) st.push(`Kürzen mit ${gcd(raw.n,raw.d)}: ${M_(fh(raw)+'<span class="es">=</span>'+fh(r))}`); return r; }
+function opSteps(a,b,op,st){
+  let raw;
+  if(op==='+'||op==='−'){ const s=op==='+'?1:-1;
+    if(a.d===b.d){ raw=new Fr(a.n+s*b.n,a.d); st.push(`Gleiche Nenner: Zähler ${op==='+'?'addieren':'subtrahieren'}: ${M_(fh(a)+o(op)+fh(b,1)+'<span class="es">=</span>'+fr(pn(a.n)+' '+op+' '+pn(b.n),a.d)+'<span class="es">=</span>'+fh(raw))}`); }
+    else { const k=lcm(a.d,b.d), an=a.n*k/a.d, bn=b.n*k/b.d; raw=new Fr(an+s*bn,k);
+      st.push(`Hauptnenner kgV(${a.d}; ${b.d}) = ${k}, beide Brüche erweitern: ${M_(fh(a)+o(op)+fh(b,1)+'<span class="es">=</span>'+fh(new Fr(an,k))+o(op)+fh(new Fr(bn,k),1))}`);
+      st.push(`Zähler verrechnen: ${M_(fr(pn(an)+' '+op+' '+pn(bn),k)+'<span class="es">=</span>'+fh(raw))}`); }
+  } else if(op==='·'){ raw=new Fr(a.n*b.n,a.d*b.d);
+    st.push(`Zähler mal Zähler, Nenner mal Nenner: ${M_(fh(a,1)+o('·')+fh(b,1)+'<span class="es">=</span>'+fr(pn(a.n)+' · '+pn(b.n),a.d+' · '+b.d)+'<span class="es">=</span>'+fh(raw))}`);
+  } else { const rb=new Fr(b.d,b.n);
+    st.push(`Durch einen Bruch teilen = mit dem Kehrwert malnehmen: ${M_(fh(a,1)+o(':')+fh(b,1)+'<span class="es">=</span>'+fh(a,1)+o('·')+fh(rb,1))}`);
+    return opSteps(a,rb,'·',st); }
+  return redStep(raw,st);
+}
+const opC=(a,b,op)=>op==='+'?new Fr(a.n*b.d+b.n*a.d,a.d*b.d).red(): op==='−'?new Fr(a.n*b.d-b.n*a.d,a.d*b.d).red(): op==='·'?new Fr(a.n*b.n,a.d*b.d).red(): new Fr(a.n*b.d,a.d*b.n).red();
+const ES='<span class="es">=</span>';
+const FT=[
+ {id:'kuerzen',name:'Kürzen',gen(lv){ const f=rf(4+lv); const k=ri(2,3+Math.min(lv,9)); const raw=new Fr(f.n*k,f.d*k);
+   return {prompt:'Kürze den Bruch vollständig.', expr:fh(raw), a:f, red:1, steps:[`Größter gemeinsamer Teiler: ggT(${raw.n}; ${raw.d}) = ${k}`, `Zähler und Nenner durch ${k} teilen: ${M_(fh(raw)+ES+fr(raw.n+' : '+k, raw.d+' : '+k)+ES+fh(f))}`]}; }},
+ {id:'gleich',name:'Gleichnamige Brüche',gen(lv){ const d=ri(3,5+lv); let a=ri(1,d-1), b=ri(1,d-1); const op=Math.random()<.5?'+':'−'; if(op==='−'&&lv<4&&a<b) [a,b]=[b,a];
+   const A=new Fr(a,d),B=new Fr(b,d), st=[]; const r=opSteps(A,B,op,st); return {prompt:'Berechne. Kürze, wenn möglich.', expr:fh(A)+o(op)+fh(B), a:r, steps:st}; }},
+ {id:'mal',name:'Brüche multiplizieren',gen(lv){ const A=maybeNeg(rf(3+lv),lv,5), B=rf(3+lv), st=[]; const r=opSteps(A,B,'·',st); return {prompt:'Multipliziere. Kürze, wenn möglich.', expr:fh(A,1)+o('·')+fh(B,1), a:r, steps:st}; }},
+ {id:'durch',name:'Brüche dividieren',gen(lv){ const A=maybeNeg(rf(3+lv),lv,5), B=rf(3+lv), st=[]; const r=opSteps(A,B,':',st); return {prompt:'Dividiere. Kürze, wenn möglich.', expr:fh(A,1)+o(':')+fh(B,1), a:r, steps:st}; }},
+ {id:'ungleich',name:'Ungleichnamige Brüche',gen(lv){ let A,B; do{ A=rf(3+lv); B=rf(3+lv); }while(A.d===B.d); const op=Math.random()<.5?'+':'−'; if(op==='−'&&lv<5&&A.val()<B.val()) [A,B]=[B,A];
+   const st=[]; const r=opSteps(A,B,op,st); return {prompt:'Bringe auf den Hauptnenner und berechne.', expr:fh(A)+o(op)+fh(B), a:r, steps:st}; }},
+ {id:'ganz',name:'Ganze und gemischte Zahlen',gen(lv){ const v=ri(0,4), st=[];
+   if(v<=3){ const n=new Fr(ri(1,6)), A=rf(3+lv); const op=['+','−','·',':'][v]; const first= v===3? A : n, second= v===3? n : A;
+     st.push(`Ganze Zahl als Bruch schreiben: ${M_(String(n.n)+ES+fr(n.n,1))}`); const r=opSteps(first,second,op,st);
+     return {prompt:'Berechne und gib das Ergebnis als Bruch an.', expr:fh(first)+o(op)+fh(second), a:r, steps:st}; }
+   const w1=ri(1,3), w2=ri(1,3), A=rf(2+lv), B=rf(2+lv); const M1=new Fr(w1*A.d+A.n,A.d), M2=new Fr(w2*B.d+B.n,B.d); const op=pick(['+','−']);
+   const [X,Y,xw,yw,xa,ya]= (op==='−'&&M1.val()<M2.val())? [M2,M1,w2,w1,B,A] : [M1,M2,w1,w2,A,B];
+   st.push(`Gemischte Zahlen in unechte Brüche umwandeln: ${M_(`${xw}${fh(xa)}`+ES+fh(X))} und ${M_(`${yw}${fh(ya)}`+ES+fh(Y))}`);
+   const r=opSteps(X,Y,op,st);
+   return {prompt:'Berechne. Gib das Ergebnis als (unechten) Bruch an.', expr:`<span class="mix">${xw}${fh(xa)}</span>${o(op)}<span class="mix">${yw}${fh(ya)}</span>`, a:r, steps:st}; }},
+ {id:'doppel',name:'Doppelbrüche',gen(lv){ const A=rf(3+lv,lv>6), B=rf(3+lv,lv>6), st=[`Ein Doppelbruch ist eine Division: Zählerbruch : Nennerbruch`]; const r=opSteps(A,B,':',st);
+   return {prompt:'Vereinfache den Doppelbruch.', expr:fr(fh(A),fh(B)), a:r, steps:st}; }},
+ {id:'kette',name:'Punkt vor Strich & Klammern',gen(lv){ const A=rf(2+lv), B=rf(2+lv), C=rf(2+lv), v=ri(0,3), st=[]; let expr, r;
+   if(v===0){ expr=fh(A)+o('+')+fh(B)+o('·')+fh(C); st.push('Punkt vor Strich: zuerst multiplizieren.'); const t=opSteps(B,C,'·',st); st.push('Dann addieren:'); r=opSteps(A,t,'+',st); }
+   else if(v===1){ expr=fh(A)+o('−')+fh(B)+o(':')+fh(C); st.push('Punkt vor Strich: zuerst dividieren.'); const t=opSteps(B,C,':',st); st.push('Dann subtrahieren:'); r=opSteps(A,t,'−',st); }
+   else if(v===2){ expr=pr(fh(A)+o('+')+fh(B))+o('·')+fh(C); st.push('Zuerst die Klammer.'); const t=opSteps(A,B,'+',st); st.push('Dann multiplizieren:'); r=opSteps(t,C,'·',st); }
+   else { expr=pr(fh(A)+o('−')+fh(B))+o(':')+fh(C); st.push('Zuerst die Klammer.'); const t=opSteps(A,B,'−',st); st.push('Dann dividieren:'); r=opSteps(t,C,':',st); }
+   return {prompt:'Berechne. Achte auf die Reihenfolge.', expr, a:r, steps:st}; }},
+ {id:'vergleich',name:'Brüche vergleichen',gen(lv){ const A=rf(4+lv); let B; if(Math.random()<.25){ const k=ri(2,4); B=new Fr(A.n*k,A.d*k); } else { do{ B=rf(4+lv); }while(B.eq(A)); }
+   const k=lcm(A.d,B.d), an=A.n*k/A.d, bn=B.n*k/B.d; const c= an<bn?'<': an>bn?'>':'=';
+   return {prompt:'Welches Zeichen gehört in die Lücke?', expr:fh(A)+'<span class="op">☐</span>'+fh(B), kind:'mc', opts:['<','>','='], ok:['<','>','='].indexOf(c), aH:fh(A)+o(c.replace('<','&lt;').replace('>','&gt;'))+fh(B),
+     steps:[`Auf den gemeinsamen Nenner ${k} bringen: ${M_(fh(A)+ES+fr(an,k))} und ${M_(fh(B)+ES+fr(bn,k))}`, `Zähler vergleichen: ${an} ${c.replace('<','&lt;').replace('>','&gt;')} ${bn}`]}; }},
+ {id:'dezimal',name:'Dezimalzahl ↔ Bruch',gen(lv){ const ds=[2,4,5,8,10,20,25,40,50]; const d=pick(ds.slice(0,Math.min(ds.length,3+lv))); let n; do{ n=ri(1, lv>5?2*d:d-1); }while(gcd(n,d)!==1 && d!==10 && Math.random()<.6);
+   const f=new Fr(n,d).red(); const p=Math.pow(10, Math.ceil(Math.log10(f.d)) + ((f.d===8||f.d===40)?1:0)); let P=10; while((P%f.d)!==0) P*=10; const fac=P/f.d; const dec=f.n/f.d;
+   if(Math.random()<.5) return {prompt:'Schreibe den Bruch als Dezimalzahl.', expr:fh(f), kind:'dec', a:dec, steps:[`Auf den Nenner ${P} erweitern: ${M_(fh(f)+ES+fr(f.n+' · '+fac, f.d+' · '+fac)+ES+fr(f.n*fac,P))}`, `${M_(fr(f.n*fac,P))} = ${de(dec)}`]};
+   const raw=new Fr(f.n*fac,P); const st=[`Als Bruch mit Nenner ${P} schreiben: ${de(dec)} = ${M_(fr(raw.n,P))}`]; redStep(raw,st);
+   return {prompt:'Schreibe die Dezimalzahl als vollständig gekürzten Bruch.', expr:`<span class="m">${de(dec)}</span>`, a:f, red:1, steps:st}; }},
+ {id:'potenz',name:'Potenzen & Kehrwert',gen(lv){ const v=ri(0,3); const A=rf(Math.min(3+lv,7)); let e, r, st=[];
+   if(v===0){ e=2; } else if(v===1){ e=lv>5?3:2; } else if(v===2){ e=-1; } else { e=2; }
+   let base=A; if(v===3||(v===1&&e===3&&Math.random()<.5)) base=new Fr(-A.n,A.d);
+   if(e===-1){ r=new Fr(base.d,base.n); st.push(`Hoch −1 bedeutet Kehrwert: Zähler und Nenner tauschen: ${M_(pw(pr(fh(base)),'−1')+ES+fh(r))}`); }
+   else { r=new Fr(Math.pow(base.n,e),Math.pow(base.d,e)); st.push(`Zähler und Nenner einzeln potenzieren: ${M_(pw(pr(fh(base)),e)+ES+fr(pw(pn(base.n),e),pw(base.d,e))+ES+fh(r))}`); if(base.n<0) st.push(e%2===0?'Gerader Exponent: Ergebnis ist positiv.':'Ungerader Exponent: das Minus bleibt.'); }
+   return {prompt:'Berechne die Potenz.', expr:pw(pr(fh(base)), e===-1?'−1':e), a:r.red(), steps:st}; }},
+ {id:'parallel',name:'Parallelschaltung',gen(lv){ const n=lv>8&&Math.random()<.5?3:2; const Rs=[]; for(let i=0;i<n;i++) Rs.push(ri(2,Math.min(6+lv,20)));
+   const inv=Rs.map(r=>new Fr(1,r)); let sum=inv[0]; const st=[`Kehrwerte addieren: ${M_(fr(1,vh('Rges'))+ES+inv.map(f=>fh(f)).join(o('+')))}`];
+   for(let i=1;i<n;i++){ sum=opSteps(sum,inv[i],'+',st); }
+   const R=new Fr(sum.d,sum.n); st.push(`Kehrwert bilden: ${M_(vh('Rges')+ES+fh(R))} Ω` + (R.d>1?` ≈ ${de(sig(R.val(),3))} Ω`:''));
+   return {prompt:`Die Widerstände sind parallel geschaltet. Berechne ${M_(vh('Rges'))} in Ω als Bruch.`, expr:fr(1,vh('Rges'))+ES+Rs.map(r=>fr(1,r+'&#8239;Ω')).join(o('+')), a:R, steps:st, unit:'Ω'}; }},
+ {id:'gleichung',name:'Bruchgleichungen',gen(lv){ const v=ri(0,3), A=rf(3+lv), B=rf(3+lv), X='<i>x</i>', st=[]; let expr, r;
+   if(v===0){ const a=ri(2,9); expr=eqH(fr(X,a),fh(B)); st.push(`Beide Seiten · ${a}`); r=opSteps(B,new Fr(a),'·',st); }
+   else if(v===1){ expr=eqH(mul(fh(A),X),fh(B)); st.push(`Beide Seiten ÷ ${M_(fh(A))}`); r=opSteps(B,A,':',st); }
+   else if(v===2){ expr=eqH(pl(X,fh(A)),fh(B)); st.push(`Beide Seiten − ${M_(fh(A))}`); r=opSteps(B,A,'−',st); }
+   else { const a=ri(2,9); expr=eqH(fr(a,X),fh(B)); st.push(`Kehrwert beider Seiten: ${M_(eqH(fr(X,a),fh(new Fr(B.d,B.n))))}`); st.push(`Beide Seiten · ${a}`); r=opSteps(new Fr(B.d,B.n),new Fr(a),'·',st); }
+   return {prompt:`Löse nach ${M_(X)} auf.`, expr, a:r, steps:st, pre:X}; }},
+];
+
+/* ================= Modi ================= */
+const MODES={
+  aufstieg:{name:'Aufstieg', lives:3, per:5, kind:'formel'},
+  baukasten:{name:'Baukasten', lives:3, per:5, kind:'formel'},
+  rechnen:{name:'Rechnen', lives:3, per:4, kind:'formel'},
+  blitz:{name:'Blitz', lives:Infinity, per:Infinity, kind:'formel'},
+  brueche:{name:'Brüche', lives:3, per:6, kind:'bruch'},
+  training:{name:'Training', lives:Infinity, per:Infinity, kind:'formel'}
+};
+const tierMax=r=>Math.min(4, 1+Math.floor((r-1)/2));
+function nOpts(){ const r=S.round; if(S.mode==='blitz') return Math.min(5,3+Math.floor(S.solved/8)); if(S.mode==='training') return 4; return r<=1?3: r<=4?4: r<=7?5:6; }
+function timeLimit(type){
+  const r=S.round, m=S.mode;
+  if(m==='aufstieg'){ if(r<4) return 0; const base=Math.max(12, 34-(r-4)*3); return 1000*(type==='build'?base+15: type==='calc'?base+50: base); }
+  if(m==='baukasten'){ return r<4?0: 1000*Math.max(20, 50-(r-4)*4); }
+  if(m==='rechnen'){ return r<5?0: 1000*Math.max(50, 120-(r-5)*10); }
+  if(m==='brueche'){ return r<5?0: 1000*Math.max(25, 75-(r-5)*6); }
+  return 0;
+}
+
+let S=null;
+function startGame(mode,opts){
+  const Mo=MODES[mode];
+  S={mode, M:Mo, round:1, qi:0, lives:Mo.lives, score:0, streak:0, bestStreak:0, roundRes:[], solved:0, total:0, wrongs:[], recent:[], recentF:[], recentT:[], opts:opts||{}, q:null, answered:false, blitzLeft:60000, tStart:0};
+  nextQ();
+}
+function qType(){
+  const r=S.round, m=S.mode;
+  if(m==='baukasten') return 'build'; if(m==='rechnen') return 'calc'; if(m==='blitz') return 'mc';
+  if(m==='training'){ const t=S.opts.type||'mix'; return t!=='mix'? t : pick(['mc','mc','build','calc']); }
+  if(r<=2) return 'mc'; if(r<=4) return Math.random()<.7?'mc':'build';
+  const x=Math.random(); return x<.5?'mc': x<.8?'build':'calc';
+}
+function pickPair(type){
+  const tmax= S.mode==='training'?4 : S.mode==='blitz'? Math.min(4,1+Math.floor(S.solved/5)) : tierMax(S.round);
+  const okT=p=>settings.topics.includes(p.f.topic), okB=p=>type!=='build'||p.f.mono;
+  let pool=PAIRS.filter(p=>okT(p)&&okB(p)&&p.f.tier<=tmax);
+  if(!pool.length) pool=PAIRS.filter(p=>okT(p)&&okB(p));
+  if(!pool.length) pool=PAIRS.filter(okB);
+  let fresh=pool.filter(p=>!S.recent.includes(p.key)&&!S.recentF.slice(-2).includes(p.f.id));
+  if(!fresh.length) fresh=pool.filter(p=>!S.recent.slice(-3).includes(p.key));
+  if(!fresh.length) fresh=pool;
+  const w=fresh.map(p=>1+(p.f.tier===tmax?1.3:0)+Math.min(3,stats.miss[p.key]||0)*1.2);
+  let t=Math.random()*w.reduce((a,b)=>a+b,0);
+  for(let i=0;i<fresh.length;i++){ t-=w[i]; if(t<=0) return fresh[i]; }
+  return fresh[fresh.length-1];
+}
+function makeFormulaQ(){
+  const type=qType(); const p=pickPair(type); const {f,x}=p;
+  S.recent.push(p.key); if(S.recent.length>12) S.recent.shift(); S.recentF.push(f.id); if(S.recentF.length>4) S.recentF.shift();
+  const q={type, f, x, key:p.key, tier:f.tier, fh:fHTML(f), solH:solHTML(f,x), steps:solSteps(f,x)};
+  if(type==='mc'){
+    const n=nOpts(); let wr;
+    if(f.mono){ const {singles,others}=monoWrongs(solveMono(f,x)); const near=S.round>=5||S.solved>15; wr=(near? singles.concat(others) : shuffle(singles.concat(others))).map(monoHTML); }
+    else wr=shuffle(f.sol[x].w);
+    const opts=[{h:q.solH,ok:true}].concat(wr.slice(0,n-1).map(h=>({h,ok:false})));
+    q.opts=shuffle(opts);
+  } else if(type==='build'){
+    const {D,root}=displayMap(solveMono(f,x)); q.D=D; q.root=root;
+    const tiles=Object.keys(D).map((k,i)=>({id:'t'+i,k,a:Math.abs(D[k]),z:'pool'}));
+    const nd= S.mode==='baukasten'? (S.round>=6?2: S.round>=3?1:0) : (S.round>=6?1:0);
+    if(nd){ const present=new Set([f.lhs].concat(Object.keys(f.rhs)).map(vh)); const cand=shuffle(Object.keys(V).filter(k=>!V[k].c && !present.has(vh(k)))); const used=new Set();
+      for(const k of cand){ if(tiles.length>=Object.keys(D).length+nd) break; if(used.has(vh(k))) continue; used.add(vh(k)); tiles.push({id:'d'+k,k,a:1,z:'pool',decoy:1}); } }
+    q.tiles=shuffle(tiles); q.useRoot=false;
+  } else if(type==='calc'){
+    for(let tries=0;tries<30;tries++){
+      let vals;
+      if(f.mono){ vals={}; const dep=f.dep||f.lhs; const all=[f.lhs].concat(Object.keys(f.rhs)).filter(k=>!isConst(k));
+        all.forEach(k=>{ if(k!==dep) vals[k]=rnd(k); }); vals[dep]=evalMap(solveMono(f,dep),vals); }
+      else vals=f.gen();
+      const keys=f.mono? [f.lhs].concat(Object.keys(f.rhs)).filter(k=>!isConst(k)) : Object.keys(vals);
+      const given=[], rv={};
+      keys.filter(k=>k!==x).forEach(k=>{ const fv=fmtVal(vals[k],k); rv[k]=fv.mant*fv.fac; given.push({k,fv}); });
+      const exp= f.mono? evalMap(solveMono(f,x),rv) : f.sol[x].fn(rv);
+      if(!isFinite(exp)||exp<=0) continue;
+      const fa=fmtVal(exp,x); q.given=given; q.exp=exp; q.ans=fa; q.rv=rv; break;
+    }
+    if(!q.ans) return makeFormulaQ();
+    let sub='';
+    if(f.mono){ SUBST=q.rv; sub=eqH(vh(x), monoHTML(solveMono(f,x))); SUBST=null; }
+    q.steps=q.steps.concat([{t:'Werte in Grundeinheiten einsetzen', e:sub||null}, {t:'Ergebnis', e:eqH(vh(x), `${q.ans.txt}&#8239;${unitTxt(q.ans)}`)}].filter(s=>s.e));
+    S.kp={fields:['a'], v:{a:''}, act:'a', comma:true};
+  }
+  return q;
+}
+function makeFracQ(){
+  const lv=S.round; const avail=FT.slice(0, Math.min(FT.length, 1+lv));
+  let t; for(let i=0;i<8;i++){ t= Math.random()<.45? avail[avail.length-1] : pick(avail); if(S.recentT.slice(-2).filter(id=>id===t.id).length<2) break; }
+  S.recentT.push(t.id); if(S.recentT.length>6) S.recentT.shift();
+  const g=t.gen(lv); const q=Object.assign({type:'frac', ft:t, key:'bruch:'+t.id}, g); q.kind=g.kind||'frac';
+  if(q.kind==='frac') S.kp={fields:['a','b'], v:{a:'',b:''}, act:'a', comma:false};
+  if(q.kind==='dec') S.kp={fields:['a'], v:{a:''}, act:'a', comma:true};
+  return q;
+}
+function nextQ(){
+  if(S.mode==='blitz') S.round=1+Math.floor(S.solved/5);
+  S.answered=false; S.fb=null;
+  S.q= S.M.kind==='bruch'? makeFracQ() : makeFormulaQ();
+  renderGame(); startTimer();
+}
+
+/* ================= Zeit ================= */
+let raf=0;
+function startTimer(){
+  stopTimer();
+  const bar=$('#tb'), tt=$('#tt');
+  const lim= S.mode==='blitz'? 0 : timeLimit(S.q.type==='frac'?'frac':S.q.type);
+  S.tLimit=lim; S.tStart=performance.now();
+  if(S.mode!=='blitz' && !lim){ S.tStart=0; return; }
+  const tick=now=>{
+    let left, frac;
+    if(S.mode==='blitz'){ left=S.blitzLeft-(now-S.tStart); frac=left/60000; }
+    else { left=lim-(now-S.tStart); frac=left/lim; }
+    if(bar){ bar.firstChild.style.transform=`scaleX(${Math.max(0,Math.min(1,frac))})`; bar.classList.toggle('low', left<5000); }
+    if(tt) tt.textContent=Math.max(0,Math.ceil(left/1000))+' s';
+    if(left<=0){ onTimeout(); return; }
+    raf=requestAnimationFrame(tick);
+  };
+  raf=requestAnimationFrame(tick);
+}
+function stopTimer(){
+  cancelAnimationFrame(raf);
+  if(S && S.tStart){ const el=performance.now()-S.tStart; if(S.mode==='blitz') S.blitzLeft-=el; S.tUsed=el; S.tStart=0; }
+}
+function onTimeout(){
+  if(S.mode==='blitz'){ stopTimer(); S.blitzLeft=0; return gameOver(); }
+  onAnswer(false,{timeout:true});
+}
+
+/* ================= Ton ================= */
+let AC=null;
+function beep(seq){ if(!settings.sound) return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); const t0=AC.currentTime+0.01;
+  seq.forEach(([f,d,s])=>{ const os=AC.createOscillator(), g=AC.createGain(); os.type='triangle'; os.frequency.value=f; g.gain.setValueAtTime(0.0001,t0+s); g.gain.exponentialRampToValueAtTime(0.16,t0+s+0.015); g.gain.exponentialRampToValueAtTime(0.0001,t0+s+d); os.connect(g); g.connect(AC.destination); os.start(t0+s); os.stop(t0+s+d+0.03); }); }catch(e){} }
+const SND={ok:[[660,.12,0],[990,.18,.08]], bad:[[196,.22,0],[147,.3,.12]], round:[[523,.14,0],[659,.14,.1],[784,.14,.2],[1046,.3,.3]], over:[[392,.2,0],[330,.2,.15],[262,.4,.3]]};
+
+/* ================= Antworten ================= */
+function onAnswer(ok, extra){
+  if(S.answered) return; S.answered=true; stopTimer(); extra=extra||{};
+  const q=S.q; let pts=0; S.total++;
+  if(ok){
+    S.streak++; S.bestStreak=Math.max(S.bestStreak,S.streak); S.solved++; stats.solved++;
+    const base= q.type==='frac'? 100+10*Math.min(S.round,10) : 100+50*(q.tier-1) + (q.type==='build'?40:0) + (q.type==='calc'?80:0);
+    const tb= S.tLimit? Math.round(60*Math.max(0,1-(S.tUsed||0)/S.tLimit)) : 0;
+    pts=Math.round((base+tb)*(1+Math.min(S.streak-1,10)*0.1)*(extra.half?0.6:1));
+    S.score+=pts; if(stats.miss[q.key]) stats.miss[q.key]=Math.max(0,stats.miss[q.key]-0.5);
+    if(S.mode==='blitz') S.blitzLeft+=2000;
+    beep(SND.ok);
+  } else {
+    S.streak=0; stats.wrong++; stats.miss[q.key]=(stats.miss[q.key]||0)+1;
+    if(isFinite(S.lives)) S.lives--;
+    if(S.mode==='blitz') S.blitzLeft=Math.max(0,S.blitzLeft-3000);
+    S.wrongs.push(q); beep(SND.bad);
+  }
+  S.roundRes.push(ok); saveStats();
+  S.fb={ok,pts,extra};
+  renderGame();
+  const fb=$('#fb'); if(fb){ fb.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth', block:'nearest'}); }
+  if(S.mode==='blitz' && ok) setTimeout(()=>{ if(S && S.answered && S.fb && S.fb.ok) cont(); }, 700);
+}
+function cont(){
+  if(!S) return;
+  if(S.mode==='blitz'){ if(S.blitzLeft<=0) return gameOver(); return nextQ(); }
+  if(S.lives<=0) return gameOver();
+  S.qi++;
+  if(S.qi>=S.M.per) return roundEnd();
+  nextQ();
+}
+
+/* ================= Rendering ================= */
+const ICON={
+  aufstieg:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 27h7v-6h6v-6h6V9h7"/><path d="M23 3h6v6"/><path d="M29 3l-8 8"/></svg>',
+  baukasten:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="6" y="3" width="9" height="9" rx="2"/><rect x="17" y="3" width="9" height="9" rx="2"/><path d="M4 16h24" stroke-linecap="round"/><rect x="11.5" y="20" width="9" height="9" rx="2"/></svg>',
+  rechnen:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="6" y="2.5" width="20" height="27" rx="3"/><rect x="10" y="6.5" width="12" height="6" rx="1"/><circle cx="16" cy="21" r="4.5"/><path d="M16 21l2.6-2.6" stroke-linecap="round"/></svg>',
+  blitz:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M18 2L6 18h9l-2 12 13-17h-9z"/></svg>',
+  brueche:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="16" cy="7" r="3"/><path d="M5 16h22"/><circle cx="16" cy="25" r="3"/></svg>',
+  training:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 6h9a4 4 0 0 1 3 1.5A4 4 0 0 1 19 6h9v20h-9a3 3 0 0 0-3 2 3 3 0 0 0-3-2H4z"/><path d="M16 8v19"/></svg>',
+  lib:'<svg viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 4h17l3 3v21H6z"/><path d="M11 12h10M11 17h10M11 22h6" stroke-linecap="round"/></svg>',
+  cog:'<svg viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="16" cy="16" r="4.5"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M6.8 25.2l2.8-2.8M22.4 9.6l2.8-2.8" stroke-linecap="round"/></svg>'
+};
+const LOGO='<svg viewBox="0 0 40 40" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h7"/><rect x="10" y="14" width="13" height="12" rx="1.5"/><path d="M23 20h4"/><path d="M29 11c5 2 7 7 5 12"/><path d="M34 23l-3-1.5M34 23l1.6-3.2"/><path d="M28 29c-4 2-8 1-10-1"/></svg>';
+const fuse=(blown)=>`<svg class="fuse${blown?' blown':''}" viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="1" width="16" height="10" rx="2"/><path d="M0 6h3M19 6h3"/>${blown?'<path d="M6 6h3.5l1 -2.5M12 8l1-2h3"/>':'<path d="M6 6h10"/>'}</svg>`;
+
+function bestTxt(m){ const b=stats.best[m], s=stats.bestScore[m];
+  if(m==='blitz') return s?`Rekord: ${s.toLocaleString('de-DE')} Punkte`:'Noch kein Rekord';
+  if(m==='training') return stats.solved?`${stats.solved} Aufgaben gelöst`:'Ohne Zeit und Leben';
+  return b?`Rekord: Runde ${b}`:'Noch kein Rekord'; }
+function renderHome(){
+  S=null; stopTimer(); hideConfirm();
+  const tot=stats.solved+stats.wrong, quote= tot? Math.round(100*stats.solved/tot)+' %' : '–';
+  $('#view').innerHTML=`
+  <div class="brand"><div class="logo">${LOGO}</div><div><h1>Umstell-Labor</h1><p>Formeln der Elektrotechnik umstellen – Runde für Runde schwerer.</p></div></div>
+  <div class="meters">
+    <div class="meter"><b>${stats.solved}</b><span>gelöst</span></div>
+    <div class="meter"><b>${quote}</b><span>Trefferquote</span></div>
+    <div class="meter"><b>${stats.best.aufstieg||0}</b><span>beste Runde</span></div>
+  </div>
+  <div class="modes">
+    <button class="mode hero" data-act="mode" data-m="aufstieg">${ICON.aufstieg}<div class="txt"><h3>Aufstieg</h3><p>Ab Runde 3 kommt der Baukasten dazu, ab Runde 4 die Uhr, ab Runde 5 Rechenaufgaben. Du hast 3 Sicherungen.</p><span class="rec">${bestTxt('aufstieg')}</span></div></button>
+    <button class="mode" data-act="mode" data-m="baukasten">${ICON.baukasten}<h3>Baukasten</h3><p>Setz die Formel selbst zusammen: Zähler, Nenner, Wurzel.</p><span class="rec">${bestTxt('baukasten')}</span></button>
+    <button class="mode" data-act="mode" data-m="rechnen">${ICON.rechnen}<h3>Rechnen</h3><p>Umstellen, einsetzen, ausrechnen – mit Einheiten und Vorsätzen.</p><span class="rec">${bestTxt('rechnen')}</span></button>
+    <button class="mode" data-act="mode" data-m="blitz">${ICON.blitz}<h3>Blitz</h3><p>60 Sekunden. Richtig: +2 s, falsch: −3 s.</p><span class="rec">${bestTxt('blitz')}</span></button>
+    <button class="mode frac" data-act="mode" data-m="brueche">${ICON.brueche}<h3>Brüche</h3><p>Kürzen, Hauptnenner, Doppelbrüche, Parallelschaltung und mehr.</p><span class="rec">${bestTxt('brueche')}</span></button>
+    <button class="mode" data-act="mode" data-m="training">${ICON.training}<h3>Training</h3><p>Ohne Zeitdruck. Du wählst Themen und Aufgabenart.</p><span class="rec">${bestTxt('training')}</span></button>
+  </div>
+  <div class="links">
+    <button class="btn" data-act="lib">${ICON.lib} Formelsammlung</button>
+    <button class="btn" data-act="settings">${ICON.cog} Einstellungen</button>
+  </div>`;
+  window.scrollTo(0,0);
+}
+function topicChips(){ return `<div class="chips">${ALL_TOPICS.map(t=>`<button class="tg" data-act="topic" data-t="${t}" aria-pressed="${settings.topics.includes(t)}">${TOPICS[t]}</button>`).join('')}</div>`; }
+function renderSettings(){
+  $('#view').innerHTML=`
+  <div class="toplink"><button class="iconbtn" data-act="home" aria-label="Zurück">←</button><h2>Einstellungen</h2></div>
+  <div class="panel">
+    <div class="sec" style="margin-top:0"><span class="label">Themen in allen Formel-Modi</span>${topicChips()}<p class="hint" style="text-align:left">Mindestens ein Thema bleibt aktiv.</p></div>
+    <div class="sec"><span class="label">Ton</span><div class="chips"><button class="tg" data-act="sound" aria-pressed="${settings.sound}">Töne ${settings.sound?'an':'aus'}</button></div></div>
+    <div class="sec"><span class="label">Fortschritt</span><p class="muted" style="margin-bottom:10px">${stats.solved} gelöst, ${stats.wrong} falsch. Formeln, die du oft falsch hast, kommen häufiger dran.</p><button class="btn danger" data-act="reset">Fortschritt zurücksetzen</button></div>
+  </div>`;
+}
+function renderTrainingSetup(){
+  const t=(store.get('ttype','mix'));
+  const types=[['mix','Gemischt'],['mc','Auswahl'],['build','Baukasten'],['calc','Rechnen']];
+  $('#view').innerHTML=`
+  <div class="toplink"><button class="iconbtn" data-act="home" aria-label="Zurück">←</button><h2>Training</h2></div>
+  <div class="panel">
+    <div class="sec" style="margin-top:0"><span class="label">Aufgabenart</span><div class="chips">${types.map(([k,n])=>`<button class="tg" data-act="ttype" data-t="${k}" aria-pressed="${t===k}">${n}</button>`).join('')}</div></div>
+    <div class="sec"><span class="label">Themen</span>${topicChips()}</div>
+    <div class="sec"><button class="btn pri wide" data-act="tstart">Training starten</button></div>
+  </div>`;
+}
+function renderLib(){
+  const groups=ALL_TOPICS.map(t=>{ const fs=F.filter(f=>f.topic===t); return `<h3>${TOPICS[t]}</h3>`+fs.map(f=>`
+    <details><summary><div><div class="nm">${f.name}</div><div class="m">${fHTML(f)}</div></div><span class="chip">${targets(f).length+ (f.mono?1:0)} Formen</span></summary>
+    <div class="alts">${targets(f).filter(x=>x!==f.lhs).map(x=>`<div class="m">${eqH(vh(x),solHTML(f,x))}</div>`).join('')}
+    <p class="note" style="margin:4px 0 0">${(f.mono?[f.lhs]:[]).concat(targets(f)).filter((v,i,a)=>a.indexOf(v)===i).map(k=>`${M_(vh(k))} ${V[k].name}${V[k].unit?' in '+V[k].unit:''}`).join(' · ')}</p></div></details>`).join(''); }).join('');
+  $('#view').innerHTML=`
+  <div class="toplink"><button class="iconbtn" data-act="home" aria-label="Zurück">←</button><h2>Formelsammlung</h2></div>
+  <p class="muted" style="margin-bottom:6px">${F.length} Formeln. Tippe eine an, um alle Umstellungen zu sehen.</p>
+  <div class="lib">${groups}</div>`;
+  window.scrollTo(0,0);
+}
+
+function hudHTML(){
+  const q=S.q; const per=S.M.per;
+  let mid;
+  if(S.mode==='blitz') mid=`<div class="t">Blitz · Stufe ${S.round}</div><div class="streak">${S.streak>1?'Serie ×'+S.streak:''}</div>`;
+  else if(S.mode==='training') mid=`<div class="t">Training · ${S.solved}/${S.total} richtig</div><div class="streak">${S.streak>1?'Serie ×'+S.streak:''}</div>`;
+  else { const pips=Array.from({length:per},(_,i)=>`<span class="pip ${i<S.roundRes.length?(S.roundRes[i]?'ok':'bad'):(i===S.qi?'cur':'')}"></span>`).join('');
+    mid=`<div class="t">Runde ${S.round} · ${Math.min(S.qi+1,per)}/${per}</div><div class="pips">${pips}</div>`; }
+  const fuses= isFinite(S.M.lives)? `<div class="fuses" aria-label="${S.lives} Sicherungen übrig">${Array.from({length:Math.max(S.lives,S.M.lives)},(_,i)=>fuse(i>=S.lives)).join('')}</div>` : (S.mode!=='blitz'&&S.mode!=='training'?'':`<div class="streak" style="text-align:right">${S.mode==='blitz'?'':''}</div>`);
+  const timer= (S.mode==='blitz'||timeLimit(q.type==='frac'?'frac':q.type))? `<div class="timebar" id="tb"><i></i></div><div class="timetxt" id="tt"></div>`:'';
+  return `<div class="hud"><button class="iconbtn" data-act="quit" aria-label="Spiel beenden">✕</button><div class="hud-mid">${mid}</div><div class="hud-r"><div class="score">${S.score.toLocaleString('de-DE')}</div>${fuses}${S.mode!=='blitz'&&S.mode!=='training'&&S.streak>1?`<div class="streak">Serie ×${S.streak}</div>`:''}</div></div>${timer}`;
+}
+function renderGame(){
+  const q=S.q; const done=S.answered;
+  let card, ans='';
+  if(q.type==='frac'){
+    card=`<div class="qcard"><div class="qhead"><span class="chip sig">${q.ft.name}</span><span class="chip">Stufe ${S.round}</span></div>
+      <div class="qtext">${q.prompt}</div><div class="formula m">${q.expr}</div></div>`;
+    if(q.kind==='mc') ans=`<div class="opts sym">${q.opts.map((s,i)=>`<button class="opt sym ${done?(i===q.ok?'ok':(S.fb.extra.pick===i?'bad':'dim')):''}" data-act="opt" data-i="${i}" ${done?'disabled':''}><span class="m">${s.replace('<','&lt;').replace('>','&gt;')}</span></button>`).join('')}</div>`;
+    else ans=inputHTML(q)+(done?'':keypadHTML());
+  } else {
+    const xn=`${M_('<b>'+vh(q.x)+'</b>')} <span class="muted">(${V[q.x].name})</span>`;
+    const txt= q.type==='mc'? `Stelle die Formel nach ${xn} um.` : q.type==='build'? `Baue die Formel nach ${xn} zusammen.` : `Berechne ${xn}.`;
+    const given= q.type==='calc'? `<div class="given">${q.given.map(g=>`<span class="gv m">${eqH(vh(g.k), g.fv.txt+(unitTxt(g.fv)?'&#8239;'+unitTxt(g.fv):''))}</span>`).join('')}</div>` : '';
+    card=`<div class="qcard"><div class="qhead"><span class="chip">${TOPICS[q.f.topic]}</span><span class="chip sig">${q.f.name}</span></div>
+      <div class="qtext">${txt}</div><div class="formula m">${q.fh}</div>${given}</div>`;
+    if(q.type==='mc') ans=`<div class="opts">${q.opts.map((op,i)=>`<button class="opt ${done?(op.ok?'ok':(S.fb.extra.pick===i?'bad':'dim')):''}" data-act="opt" data-i="${i}" ${done?'disabled':''}><span class="n">${i+1}</span><span class="m">${eqH(vh(q.x),op.h)}</span></button>`).join('')}</div>`;
+    else if(q.type==='build') ans=buildHTML(q);
+    else ans=inputHTML(q)+(done?'':keypadHTML());
+  }
+  $('#view').innerHTML=hudHTML()+card+`<div class="answer">${ans}</div>`+(done?fbHTML():'');
+  if(S.mode==='blitz'||S.tStart){ /* timer redraws itself */ }
+}
+function inputHTML(q){
+  const kp=S.kp, done=S.answered;
+  const fld=(id,ph)=>`<button class="field ${!done&&kp.act===id?'act':''}" data-act="field" data-f="${id}" id="f_${id}" ${done?'disabled':''}>${kp.v[id]? kp.v[id].replace('-','−').replace('.',','):`<span class="ph">${ph}</span>`}</button>`;
+  if(q.type==='calc') return `<div class="inrow"><span class="m">${vh(q.x)}<span class="es">=</span></span>${fld('a','Ergebnis')}<span class="unit">${unitTxt(q.ans)||'&nbsp;'}</span></div>`;
+  const pre= q.pre? `<span class="m">${q.pre}<span class="es">=</span></span>` : '';
+  if(q.kind==='dec') return `<div class="inrow">${pre}${fld('a','Dezimalzahl')}</div>`;
+  return `<div class="inrow">${pre}<div class="ffr">${fld('a','Zähler')}<div class="bar"></div>${fld('b','Nenner')}</div>${q.unit?`<span class="unit">${q.unit}</span>`:''}</div>`;
+}
+function keypadHTML(){
+  const kp=S.kp; const two=kp.fields.length>1;
+  const k=(v,l,c)=>`<button class="k ${c||''}" data-act="kp" data-k="${v}">${l||v}</button>`;
+  return `<div class="kp">${k('7')}${k('8')}${k('9')}${k('del','⌫','fn')}${k('4')}${k('5')}${k('6')}${k('neg','±','fn')}${k('1')}${k('2')}${k('3')}${k('ok','Prüfen','go')}${two?k('sw','Zähler/Nenner','fn'):k(',',',','fn')}${k('0')}${two?k('clr','C','fn'):k('clr','C','fn')}</div>`;
+}
+function buildHTML(q){
+  const done=S.answered;
+  const tile=t=>`<button class="tile ${t.z!=='pool'?'inz':''} ${done&&S.fb.extra.bad&&S.fb.extra.bad.includes(t.id)?'bad':''}" data-act="tile" data-id="${t.id}" ${done?'disabled':''}>${M_(groupHTML({[t.k]:t.a}))}</button>`;
+  const zone=(z,ph)=>{ const ts=q.tiles.filter(t=>t.z===z); return `<div class="zone ${ts.length?'':'empty'}" data-ph="${ph}">${ts.map(tile).join('')}</div>`; };
+  const frac=`<div class="bfrac">${zone('num','Zähler (leer = 1)')}<div class="bbar"></div>${zone('den','Nenner')}</div>`;
+  const body= q.useRoot? `<span class="brt"><svg class="rsv" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0.6 11.6 L3 10.2 L5.9 19.2 L10 0.6"/></svg><span class="bin">${frac}</span></span>` : frac;
+  return `<div class="build"><div class="bline"><span class="m">${vh(q.x)}</span><span class="es m">=</span>${body}</div>
+    <div class="pool">${q.tiles.filter(t=>t.z==='pool').map(tile).join('')||'<span class="hint" style="margin:auto">Alle Bausteine verbaut</span>'}</div>
+    ${done?'':`<div class="bctl"><button class="btn rootbtn" data-act="root" aria-pressed="${q.useRoot}">√ Wurzel</button><button class="btn pri" data-act="check">Prüfen</button></div>
+    <p class="hint">Tippe einen Baustein: Ablage → Zähler → Nenner → Ablage.${q.tiles.some(t=>t.decoy)?' Nicht jeder Baustein gehört in die Formel.':''}</p>`}</div>`;
+}
+function stepsHTML(steps){
+  return `<ol class="steps">${steps.map(s=> typeof s==='string'? `<li><div class="bs">${s}</div></li>` : `<li><div><div class="sd">${s.t}</div><div class="se m">${s.e}</div></div></li>`).join('')}</ol>`;
+}
+function fbHTML(){
+  const q=S.q, fb=S.fb; const ok=fb.ok;
+  let head= ok? (fb.extra.half?'Richtig – aber noch kürzbar':'Richtig!') : (fb.extra.timeout?'Zeit abgelaufen':'Leider falsch');
+  let sol, note='';
+  if(q.type==='frac'){
+    sol= q.kind==='mc'? M_(q.aH) : M_((q.pre?q.pre+'<span class="es">=</span>':'')+(q.kind==='dec'? de(q.a) : fh(q.a))+(q.unit?'&#8239;'+q.unit:''));
+    if(fb.extra.notRed) note='Dein Ergebnis stimmt im Wert, ist aber nicht vollständig gekürzt.';
+    if(fb.extra.half) note='Der Wert stimmt. Vollständig gekürzt lautet das Ergebnis so:';
+  } else if(q.type==='calc'){
+    sol=M_(eqH(vh(q.x), `${q.ans.txt}&#8239;${unitTxt(q.ans)}`));
+    if(!ok && fb.extra.val!=null) note=`Deine Eingabe: ${de(fb.extra.val)} ${unitTxt(q.ans)}. Umgestellt lautet die Formel ${M_(eqH(vh(q.x),q.solH))}.`;
+  } else sol=M_(eqH(vh(q.x),q.solH));
+  if(q.type==='build' && !ok && fb.extra.why) note=fb.extra.why;
+  const last= S.mode!=='blitz' && S.lives<=0;
+  const btn= last? 'Auswertung' : (S.mode!=='blitz'&&S.mode!=='training'&&S.qi+1>=S.M.per)? 'Runde abschließen' : 'Weiter';
+  const auto= S.mode==='blitz'&&ok;
+  return `<div class="fb ${ok?'ok':'bad'} pop" id="fb"><div class="fbh"><h2>${head}</h2>${ok?`<span class="pts">+${fb.pts}</span>`:''}</div>
+    ${note?`<p class="note">${note}</p>`:''}<div class="sol">${sol}</div>
+    ${auto?'':`<span class="label">Lösungsweg</span>${stepsHTML(q.steps)}<button class="btn pri wide" data-act="next" id="nextbtn">${btn} ↵</button>`}</div>`;
+}
+
+function roundEnd(){
+  const okc=S.roundRes.filter(Boolean).length, perfect=okc===S.M.per;
+  let bonus=''; if(perfect && isFinite(S.M.lives) && S.lives<5){ S.lives++; bonus='Fehlerfreie Runde: +1 Sicherung'; }
+  stats.best[S.mode]=Math.max(stats.best[S.mode]||0, S.round); stats.bestScore[S.mode]=Math.max(stats.bestScore[S.mode]||0,S.score); saveStats();
+  beep(SND.round);
+  const nr=S.round+1, pv=[];
+  if(S.M.kind==='bruch'){ const nt=FT[Math.min(FT.length-1, nr)]; if(nr<FT.length) pv.push('Neu: '+nt.name); pv.push('Größere Zahlen'); if(nr===5) pv.push('Ab jetzt läuft die Uhr'); }
+  else {
+    const t1=tierMax(S.round), t2=tierMax(nr); if(t2>t1) pv.push(['','','Mehr Größen pro Formel, Konstanten wie 2π','Quadrate und Wurzeln, Summen in Formeln','Brüche in Brüchen, Thomson, Drehstrom'][t2]);
+    if(S.mode==='aufstieg'){ if(nr===3) pv.push('Neu: Baukasten-Aufgaben'); if(nr===4) pv.push('Ab jetzt läuft die Uhr'); if(nr===5) pv.push('Neu: Rechenaufgaben mit Einheiten'); if(nr===2||nr===5||nr===8) pv.push(`${nr<=4?4:nr<=7?5:6} Antworten zur Auswahl`); if(nr>4) pv.push(`Zeitlimit für Auswahl: ${Math.max(12,34-(nr-4)*3)} s`); }
+    if(S.mode==='baukasten'){ if(nr===3) pv.push('Ein falscher Baustein liegt dabei'); if(nr===6) pv.push('Zwei falsche Bausteine'); if(nr>=4) pv.push(`Zeitlimit: ${Math.max(20,50-(nr-4)*4)} s`); }
+    if(S.mode==='rechnen' && nr>=5) pv.push(`Zeitlimit: ${Math.max(50,120-(nr-5)*10)} s`);
+  }
+  if(!pv.length) pv.push('Gleiche Regeln, schwerere Mischung');
+  $('#view').innerHTML=`<div class="panel center pop">
+    <span class="label">Runde ${S.round} geschafft</span>
+    <div class="big" style="margin-top:8px">${okc}/${S.M.per}</div><p class="muted">richtig</p>
+    <div class="kv"><div><b>${S.score.toLocaleString('de-DE')}</b><span>Punkte</span></div><div><b>${S.lives}</b><span>Sicherungen</span></div><div><b>${S.bestStreak}</b><span>beste Serie</span></div></div>
+    ${bonus?`<p class="pts" style="margin-bottom:6px">${bonus}</p>`:''}
+    <span class="label">In Runde ${nr}</span><ul class="preview">${pv.map(p=>`<li>${p}</li>`).join('')}</ul>
+    <div class="stack"><button class="btn pri wide" data-act="nextRound" id="nextbtn">Runde ${nr} starten ↵</button><button class="btn ghost wide" data-act="home">Zum Menü</button></div></div>`;
+  window.scrollTo(0,0);
+}
+function gameOver(){
+  stopTimer(); beep(SND.over);
+  const m=S.mode; const reached= m==='blitz'? null : S.round;
+  if(m!=='blitz' && m!=='training') stats.best[m]=Math.max(stats.best[m]||0, S.round);
+  const prevBest=stats.bestScore[m]||0; const isRec=S.score>prevBest; stats.bestScore[m]=Math.max(prevBest,S.score); saveStats();
+  const seen=new Set(); const wl=S.wrongs.filter(q=>{ if(seen.has(q.key)) return false; seen.add(q.key); return true; }).slice(-6);
+  const wh=wl.map(q=> q.type==='frac'? `<div class="m">${q.expr}<span class="es">=</span>${q.kind==='mc'?'':(q.kind==='dec'?de(q.a):fh(q.a))}</div>` : `<div class="m">${eqH(vh(q.x),q.solH)}</div>`).join('');
+  const title= m==='blitz'? 'Zeit ist um' : m==='training'? 'Training beendet' : 'Alle Sicherungen durch';
+  $('#view').innerHTML=`<div class="panel center pop">
+    <span class="label">${title}</span>
+    <div class="big" style="margin-top:8px">${S.score.toLocaleString('de-DE')}</div><p class="muted">Punkte${isRec&&S.score>0?' – neuer Rekord!':''}</p>
+    <div class="kv"><div><b>${m==='blitz'?S.solved:reached}</b><span>${m==='blitz'?'gelöst':'Runde'}</span></div><div><b>${S.total?Math.round(100*S.solved/S.total):0} %</b><span>richtig</span></div><div><b>${S.bestStreak}</b><span>beste Serie</span></div></div>
+    ${wh?`<span class="label">Das solltest du dir nochmal ansehen</span><div class="wronglist">${wh}</div>`:''}
+    <div class="stack" style="margin-top:16px"><button class="btn pri wide" data-act="again" id="nextbtn">Nochmal ↵</button><button class="btn ghost wide" data-act="home">Zum Menü</button></div></div>`;
+  S.over=true; window.scrollTo(0,0);
+}
+
+/* ================= Prüfen ================= */
+function checkBuild(){
+  const q=S.q; const user={}; const bad=[];
+  for(const t of q.tiles){ if(t.z==='pool'){ if(!t.decoy) bad.push(t.id); continue; } if(t.decoy){ bad.push(t.id); continue; } user[t.k]=(user[t.k]||0)+(t.z==='num'?t.a:-t.a); }
+  let ok= !bad.length && mkey(user)===mkey(q.D) && q.useRoot===q.root;
+  let why='';
+  if(!ok){
+    if(q.tiles.some(t=>t.z==='pool'&&!t.decoy)) why='Es fehlen noch Bausteine in der Formel.';
+    else if(q.tiles.some(t=>t.z!=='pool'&&t.decoy)) why='Ein Baustein gehört gar nicht in diese Formel.';
+    else if(q.useRoot!==q.root) why= q.root? 'Die Größe kommt im Quadrat vor – du brauchst die Wurzel.' : 'Hier ist keine Wurzel nötig.';
+    else why='Ein oder mehrere Bausteine stehen auf der falschen Seite des Bruchstrichs.';
+    q.tiles.forEach(t=>{ if(t.decoy){ if(t.z!=='pool') bad.push(t.id); return; } const want=q.D[t.k]>0?'num':'den'; if(t.z!==want && !bad.includes(t.id)) bad.push(t.id); });
+  }
+  onAnswer(ok,{bad,why});
+}
+function parseNum(s){ if(!s||s==='-'||s===',') return NaN; return parseFloat(s.replace(',','.')); }
+function checkInput(){
+  const q=S.q, kp=S.kp;
+  if(q.type==='calc'){
+    const u=parseNum(kp.v.a); if(isNaN(u)) return nudge('a');
+    const exact=q.exp/q.ans.fac; const ok=Math.abs(u-exact)<=Math.abs(exact)*0.01+1e-12;
+    return onAnswer(ok,{val:u});
+  }
+  if(q.kind==='dec'){ const u=parseNum(kp.v.a); if(isNaN(u)) return nudge('a'); return onAnswer(Math.abs(u-q.a)<1e-9,{}); }
+  const n=parseNum(kp.v.a); let d=kp.v.b===''?1:parseNum(kp.v.b);
+  if(isNaN(n)) return nudge('a'); if(isNaN(d)||d===0) return nudge('b');
+  if(n%1!==0||d%1!==0) return nudge(n%1!==0?'a':'b');
+  const u=new Fr(n,d); const a=q.a;
+  if(!u.eq(a)) return onAnswer(false,{});
+  if(!u.isRed()){ if(q.red) return onAnswer(false,{notRed:1}); return onAnswer(true,{half:1}); }
+  onAnswer(true,{});
+}
+function nudge(f){ const el=$('#f_'+f); if(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); } S.kp.act=f; refreshInput(); }
+function refreshInput(){
+  const ans=document.querySelector('.answer'); if(!ans||!S||S.answered) return;
+  const q=S.q; ans.innerHTML=inputHTML(q)+keypadHTML();
+}
+function kpPress(k){
+  if(!S||S.answered||!S.kp) return; const kp=S.kp; let v=kp.v[kp.act]||'';
+  if(/^\d$/.test(k)){ if(v.replace(/[-.,]/g,'').length<9) v=(v==='0'?'':v.replace(/^-0$/,'-'))+k; }
+  else if(k===','){ if(kp.comma && !v.includes(',')) v=(v===''||v==='-')? v+'0,' : v+','; }
+  else if(k==='neg'){ v= v.startsWith('-')? v.slice(1) : '-'+v; }
+  else if(k==='del'){ v=v.slice(0,-1); if(v===''&&kp.fields.length>1&&kp.act==='b'&&!kp.v.b){ kp.act='a'; } }
+  else if(k==='clr'){ kp.fields.forEach(f=>kp.v[f]=''); kp.act=kp.fields[0]; refreshInput(); return; }
+  else if(k==='sw'){ if(kp.fields.length>1) kp.act= kp.act==='a'?'b':'a'; refreshInput(); return; }
+  else if(k==='ok'){ return checkInput(); }
+  kp.v[kp.act]=v; refreshInput();
+}
+
+/* ================= Bestätigung ================= */
+function showConfirm(text, yes, yesLabel){
+  const c=$('#confirm'); c.innerHTML=`<p>${text}</p><button class="btn" data-act="cNo">Abbrechen</button><button class="btn danger" data-act="cYes">${yesLabel}</button>`; c.hidden=false; c._yes=yes;
+}
+function hideConfirm(){ const c=$('#confirm'); if(c){ c.hidden=true; c._yes=null; } }
+
+/* ================= Aktionen ================= */
+const ACT={
+  mode:b=>{ const m=b.dataset.m; if(m==='training') return renderTrainingSetup(); startGame(m); },
+  home:()=>renderHome(), settings:()=>renderSettings(), lib:()=>renderLib(),
+  topic:b=>{ const t=b.dataset.t; const i=settings.topics.indexOf(t); if(i>=0){ if(settings.topics.length>1) settings.topics.splice(i,1); } else settings.topics.push(t); saveSettings(); b.setAttribute('aria-pressed', settings.topics.includes(t)); },
+  sound:b=>{ settings.sound=!settings.sound; saveSettings(); b.setAttribute('aria-pressed',settings.sound); b.textContent='Töne '+(settings.sound?'an':'aus'); if(settings.sound) beep(SND.ok); },
+  reset:()=>showConfirm('Gelöste Aufgaben, Rekorde und Fehlerstatistik löschen?', ()=>{ stats={best:{},bestScore:{},solved:0,wrong:0,miss:{}}; saveStats(); renderSettings(); }, 'Löschen'),
+  ttype:b=>{ store.set('ttype',b.dataset.t); document.querySelectorAll('[data-act="ttype"]').forEach(x=>x.setAttribute('aria-pressed', x===b)); },
+  tstart:()=>startGame('training',{type:store.get('ttype','mix')}),
+  opt:b=>{ if(!S||S.answered) return; const i=+b.dataset.i; const q=S.q; const ok= q.type==='frac'? i===q.ok : q.opts[i].ok; onAnswer(ok,{pick:i}); },
+  tile:b=>{ if(!S||S.answered) return; const t=S.q.tiles.find(t=>t.id===b.dataset.id); t.z= t.z==='pool'?'num': t.z==='num'?'den':'pool'; document.querySelector('.answer').innerHTML=buildHTML(S.q); },
+  root:()=>{ if(!S||S.answered) return; S.q.useRoot=!S.q.useRoot; document.querySelector('.answer').innerHTML=buildHTML(S.q); },
+  check:()=>{ if(!S||S.answered) return; checkBuild(); },
+  kp:b=>kpPress(b.dataset.k),
+  field:b=>{ if(!S||S.answered) return; S.kp.act=b.dataset.f; refreshInput(); },
+  next:()=>cont(),
+  nextRound:()=>{ S.round++; S.qi=0; S.roundRes=[]; nextQ(); },
+  again:()=>startGame(S.mode,S.opts),
+  quit:()=>{ if(!S) return renderHome(); if(S.mode==='training') return gameOver(); showConfirm('Spiel beenden? Der Fortschritt dieser Partie geht verloren.', ()=>renderHome(), 'Beenden'); },
+  cNo:()=>hideConfirm(),
+  cYes:()=>{ const c=$('#confirm'); const y=c._yes; hideConfirm(); if(y) y(); }
+};
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act; if(ACT[a]) ACT[a](b); });
+document.addEventListener('keydown',e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  const c=$('#confirm'); if(!c.hidden){ if(e.key==='Escape') hideConfirm(); return; }
+  if(e.key==='Enter'){ const nb=$('#nextbtn'); if(nb){ e.preventDefault(); nb.click(); return; } }
+  if(!S||S.answered||S.over) return;
+  const q=S.q;
+  if((q.type==='mc'||(q.type==='frac'&&q.kind==='mc')) && /^[1-6]$/.test(e.key)){ const b=document.querySelector(`[data-act="opt"][data-i="${+e.key-1}"]`); if(b){ e.preventDefault(); b.click(); } return; }
+  if(q.type==='build' && e.key==='Enter'){ e.preventDefault(); checkBuild(); return; }
+  if(S.kp && (q.type==='calc'||(q.type==='frac'&&q.kind!=='mc'))){
+    let k=null; if(/^\d$/.test(e.key)) k=e.key; else if(e.key===','||e.key==='.') k=','; else if(e.key==='-') k='neg'; else if(e.key==='Backspace') k='del'; else if(e.key==='Enter') k='ok'; else if(e.key==='/'||e.key==='Tab') k='sw';
+    if(k){ e.preventDefault(); kpPress(k); }
+  }
+});
+renderHome();
+</script>
+<script>
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+</script>
+</body>
+</html>

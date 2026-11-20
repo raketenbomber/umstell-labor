@@ -1,0 +1,17 @@
+{
+  "name": "Umstell-Labor",
+  "short_name": "Umstell-Labor",
+  "description": "Formeln der Elektrotechnik umstellen – Runde für Runde schwerer.",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#E7EEEA",
+  "theme_color": "#0B7A54",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
